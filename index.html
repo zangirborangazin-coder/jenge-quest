@@ -246,11 +246,14 @@
     .choice-button:active { transform: scale(.98); }
     .choice-grid.is-shuffling .choice-button:disabled { cursor: wait; }
     .choice-grid.is-locked .choice-button:not(.is-target) { opacity: .58; }
-    .choice-marker { width: 18px; height: 18px; flex: 0 0 18px; border: 2px solid rgba(114,65,91,.58); border-radius: 50%; }
+    .choice-marker { display: grid; width: 20px; height: 20px; flex: 0 0 20px; place-items: center; border: 2px solid rgba(114,65,91,.58); border-radius: 50%; }
     .choice-button.is-target { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(167,85,120,.18); }
-    .choice-button.is-target .choice-marker { border-color: var(--gold); background: var(--gold); box-shadow: inset 0 0 0 3px rgba(248,232,240,.9); }
+    .choice-button.is-target .choice-marker { border: 0; background: transparent; box-shadow: none; font-size: 1.15rem; animation: runaway-laugh .4s ease-in-out infinite alternate; }
+    .choice-button.is-target .choice-marker::before { content: "😄"; }
     .choice-label { flex: 1; }
     .choice-button.is-correct { border-color: var(--gold); color: #fff8fb; background: linear-gradient(110deg, #a75578, #c97696); box-shadow: 0 8px 22px rgba(140,62,97,.2); animation: answer-flight .7s cubic-bezier(.2,.8,.2,1) both; }
+    .choice-button.is-correct .choice-marker { border: 0; }
+    .choice-button.is-correct .choice-marker::before { content: "💖"; font-size: 1.15rem; }
     .choice-button:disabled { cursor: default; }
     .correct-answer-slot { display: flex; min-height: 58px; justify-content: center; margin: 12px auto 0; }
     .advance-note { display: block; margin-top: 8px; color: var(--muted); font-size: .84rem; }
@@ -425,6 +428,11 @@
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    @keyframes runaway-laugh {
+      from { transform: rotate(-12deg) translateY(1px); }
+      to { transform: rotate(12deg) translateY(-2px); }
+    }
+
     @media (max-width: 650px) {
       .page { padding: 24px 14px; }
       .card { border-radius: 22px; }
@@ -453,7 +461,7 @@
 <body>
   <main class="page">
     <div class="shell">
-      <p class="eyebrow">Естеліктерге толы шағын саяхат</p>
+      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐</p>
       <section id="app" class="card" aria-live="polite"></section>
     </div>
   </main>
@@ -467,7 +475,7 @@
         options: ["Жеңешеге", "Ағаға", "Әжеге", "Бүкіл қонақтарға"],
         correctOption: 0,
         shuffleCount: 2,
-        success: "Дұрыс! Бұл квест сізге арнап дайындалды."
+        success: "Дұрыс! Бұл квест сізге арнап дайындалды. 🥰"
       },
       {
         title: "Туған күн",
@@ -475,7 +483,7 @@
         options: ["8 наурыз", "22 мамыр", "27 қараша", "1 тамыз"],
         correctOption: 2,
         shuffleCount: 5,
-        success: "Туған күніңізбен құттықтаймыз! Енді естелік сұрақтарға көшеміз."
+        success: "Туған күніңізбен құттықтаймыз! Енді естелік сұрақтарға көшеміз. 🎂💐"
       },
       {
         title: "Ерекше кездесу",
@@ -485,9 +493,9 @@
         shuffleCount: 3,
         image: "08.03.2019.jpg",
         imageAlt: "Отбасының гүл сыйлаған ерекше кездесудегі суреті",
-        caption: "Бәріміз алғаш жақындасқан күн",
+        caption: "Бәріміз алғаш жақындасқан күн 💖",
         hint: "ADK",
-        success: "Дәл таптыңыз! Сол күннен бері бәріміз бір үлкен де ұйымшыл отбасыға айналдық."
+        success: "Дәл таптыңыз! Сол күннен бері бәріміз бір үлкен де ұйымшыл отбасыға айналдық. 💖"
       },
       {
         title: "Ұсыныс жасаған күн",
@@ -497,8 +505,8 @@
         shuffleCount: 4,
         image: "22.05.2022.jpg",
         imageAlt: "Жұптың кешкі кездесу сәті",
-        caption: "Ортақ тарихтың алғашқы тарауы",
-        success: "Керемет! Сол күннен бастап ортақ бақытты тарихтың жаңа тарауы басталды."
+        caption: "Ортақ тарихтың алғашқы тарауы 💍",
+        success: "Керемет! Сол күннен бастап ортақ бақытты тарихтың жаңа тарауы басталды. 💍"
       },
       {
         title: "Той күні",
@@ -508,9 +516,9 @@
         shuffleCount: 6,
         image: "01.08.2022.jpg",
         imageAlt: "Той күніндегі жас жұбайлар мен жақындары",
-        caption: "Бақытқа толы той күні",
+        caption: "Бақытқа толы той күні 🎉",
         hint: "Жаздың ең алғашқы күні, 2022 жыл.",
-        success: "Тамаша! Сол күнгі қуаныш пен жылулық бүгін де жалғасып келеді."
+        success: "Тамаша! Сол күнгі қуаныш пен жылулық бүгін де жалғасып келеді. 🎉💞"
       }
     ];
     const otherChoiceJokes = [
@@ -548,19 +556,19 @@
       currentStep = -1;
       app.innerHTML = `
         <div class="intro">
-          <h1>Туған күн<br>квесті</h1>
-          <p class="intro-copy">Жылы естеліктерге бірге саяхат жасап, бүгінгі күннің қуанышын бөлісейік.</p>
+          <h1>Туған күн 🎂<br>квесті ✨</h1>
+          <p class="intro-copy">Жылы естеліктерге бірге саяхат жасап, бүгінгі күннің қуанышын бөлісейік. 💖</p>
           <div class="wifi" aria-label="Үйдің Wi-Fi желісі">
             <div class="wifi-item"><span class="wifi-label">Желі атауы</span><span class="wifi-value">Merekenin_Basty_Keiipkeri</span></div>
           </div>
-          <p class="wifi-hint">Подсказка: Бүгінгі ерекше күн!</p>
+          <p class="wifi-hint">Подсказка: Бүгінгі ерекше күн! ☀️</p>
           <form class="wifi-form" id="wifiForm">
             <label class="sr-only" for="wifiPassword">Wi-Fi құпиясөзі</label>
             <input class="answer-input" id="wifiPassword" name="wifiPassword" type="password" placeholder="Құпиясөзді енгізіңіз" autocomplete="off" required>
-            <button class="button" id="startButton" type="submit">Квестті бастау <span aria-hidden="true">→</span></button>
+            <button class="button" id="startButton" type="submit">Квестті бастау ✨ <span aria-hidden="true">→</span></button>
             <p class="feedback" id="wifiFeedback" role="status" hidden></p>
           </form>
-          <p class="welcome" id="welcomeMessage" hidden>Қош келдіңіз! Квест басталады!</p>
+          <p class="welcome" id="welcomeMessage" hidden>Қош келдіңіз! Квест басталады! 🎉</p>
         </div>`;
       document.querySelector("#wifiForm").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -588,7 +596,7 @@
       otherChoiceAttempts = 0;
       const isMemory = Boolean(step.image);
       const content = `
-        <div class="progress-wrap" aria-label="Квест барысы">
+        <div class="progress-wrap" aria-label="Квест барысы ✨">
           <div class="progress-heading"><span>${index + 1}-ші блок</span><span>${index + 1} / ${steps.length}</span></div>
           <div class="progress-track"><div class="progress-fill" style="width:${((index + 1) / steps.length) * 100}%"></div></div>
         </div>
@@ -614,11 +622,11 @@
 
     function stepContent(step, index) {
       const answerControl = step.options
-        ? `<p class="choice-instruction">Тест нұсқаларының бірін таңдаңыз — дұрыс жауап қашып кетуі мүмкін!</p>
+        ? `<p class="choice-instruction">Тест нұсқаларының бірін таңдаңыз — дұрыс жауап қашып кетуі мүмкін! 😄</p>
            <div class="choice-grid">${step.options.map((option, optionIndex) => `<div class="choice-slot"><button class="choice-button" type="button" data-choice="${optionIndex}"><span class="choice-marker" aria-hidden="true"></span><span class="choice-label">${option}</span></button></div>`).join("")}</div>`
         : "";
       const hintButton = step.hint
-        ? `<button class="button secondary hint-button" id="hintButton" type="button">Подсказка алу</button>`
+        ? `<button class="button secondary hint-button" id="hintButton" type="button">Подсказка алу 💡</button>`
         : "";
       return `
         <div class="step-label">${index + 1}-ші блок</div>
@@ -647,7 +655,7 @@
 
       if (choiceIndex !== step.correctOption) {
         const feedback = document.querySelector("#feedback");
-        feedback.textContent = "Қате жауап! Бұл нұсқа алынып тасталды. Қалғандарын байқап көріңіз.";
+        feedback.textContent = "Қате жауап! Бұл нұсқа алынып тасталды. Қалғандарын байқап көріңіз 🙂";
         feedback.hidden = false;
         selectedButton.parentElement.replaceChildren();
         return;
@@ -671,8 +679,8 @@
       selectedButton.disabled = true;
       shuffleMovesLeft -= 1;
       feedback.textContent = shuffleMovesLeft > 0
-        ? `Дұрыс! Тағы ${shuffleMovesLeft} рет қашады — ұстап көріңіз!`
-        : "Соңғы рет қашты! Енді дұрыс жауапты қайта басып, блокты ашыңыз.";
+        ? `Дұрыс! 😄 Тағы ${shuffleMovesLeft} рет қашады — ұстап көріңіз!`
+        : "Соңғы рет қашты 😆 Енді дұрыс жауапты қайта басып, блокты ашыңыз!";
       feedback.hidden = false;
       swapChoicePositions(grid, selectedButton);
       shuffleTimer = window.setTimeout(() => {
@@ -737,8 +745,8 @@
       if (photo) photo.classList.add("is-revealed");
       const message = document.querySelector("#successMessage");
       const pauseText = step.image
-        ? "Суретті тамашалаңыз! Келесі блок 5 секундтан кейін ашылады."
-        : "Келесі блок 5 секундтан кейін ашылады.";
+        ? "Суретті тамашалаңыз! 🥰 Келесі блок 5 секундтан кейін ашылады."
+        : "Келесі блок 5 секундтан кейін ашылады ✨";
       message.innerHTML = `<strong>${step.success}</strong><span class="advance-note">${pauseText}</span>`;
       message.hidden = false;
       let seconds = 5;
@@ -749,12 +757,12 @@
           window.clearInterval(advanceCountdownTimer);
           advanceCountdownTimer = null;
           advanceNote.textContent = step.image
-            ? "Суретті тамашалаңыз! Келесі блок ашылуда..."
-            : "Келесі блок ашылуда...";
+            ? "Суретті тамашалаңыз! 🥰 Келесі блок ашылуда..."
+            : "Келесі блок ашылуда ✨";
         } else {
           advanceNote.textContent = step.image
-            ? `Суретті тамашалаңыз! Келесі блок ${seconds} секундтан кейін ашылады.`
-            : `Келесі блок ${seconds} секундтан кейін ашылады.`;
+            ? `Суретті тамашалаңыз! 🥰 Келесі блок ${seconds} секундтан кейін ашылады.`
+            : `Келесі блок ${seconds} секундтан кейін ашылады ✨`;
         }
       }, 1000);
       advanceTimer = window.setTimeout(() => {
@@ -841,12 +849,12 @@
       currentStep = steps.length;
       app.innerHTML = `
         <div class="final">
-          <p class="eyebrow">Біздің қымбат жанымызға</p>
+          <p class="eyebrow">Біздің қымбат жанымызға 💝</p>
           <div class="gift-scene">
             <div class="gift-wrap">
               <div class="gift-note" role="status">
-                <h2>Туған күніңізбен,<br>жеңеше!</h2>
-                <p class="final-copy">Сізге зор денсаулық, мол бақыт, отбасылық жылулық пен сәттілік тілеймін. Бүгінгі күн сізге тек қуаныш пен жақсы көңіл-күй сыйласын!</p>
+                <h2>Туған күніңізбен, 🎂<br>жеңеше! 💐</h2>
+                <p class="final-copy">Сізге зор денсаулық, мол бақыт, отбасылық жылулық пен сәттілік тілеймін. Бүгінгі күн сізге тек қуаныш пен жақсы көңіл-күй сыйласын! 🥰💖</p>
               </div>
               <div class="gift-box" aria-hidden="true">
                 <div class="gift-body"></div>
@@ -854,20 +862,20 @@
               </div>
             </div>
           </div>
-          <button class="button gallery-button" id="galleryButton" type="button" aria-controls="photoGallery" aria-expanded="false" hidden>Үш естелікті көру</button>
-          <button class="button secondary" id="againButton" type="button">Квестті қайта бастау</button>
+          <button class="button gallery-button" id="galleryButton" type="button" aria-controls="photoGallery" aria-expanded="false" hidden>Үш естелікті көру 📸</button>
+          <button class="button secondary" id="againButton" type="button">Квестті қайта бастау 🔄</button>
           <div class="photo-gallery" id="photoGallery" aria-label="Естелік суреттер" hidden>
             <figure class="gallery-photo">
               <img src="08.03.2019.jpg" alt="Отбасының гүл сыйлаған ерекше кездесудегі суреті">
-              <figcaption>Бәріміз алғаш жақындасқан күн</figcaption>
+              <figcaption>Бәріміз алғаш жақындасқан күн 💖</figcaption>
             </figure>
             <figure class="gallery-photo">
               <img src="22.05.2022.jpg" alt="Жұптың кешкі кездесу сәті">
-              <figcaption>Ортақ тарихтың алғашқы тарауы</figcaption>
+              <figcaption>Ортақ тарихтың алғашқы тарауы 💍</figcaption>
             </figure>
             <figure class="gallery-photo">
               <img src="01.08.2022.jpg" alt="Той күніндегі жас жұбайлар мен жақындары">
-              <figcaption>Бақытқа толы той күні</figcaption>
+              <figcaption>Бақытқа толы той күні 🎉</figcaption>
             </figure>
           </div>
         </div>`;
@@ -880,7 +888,7 @@
       galleryButton.addEventListener("click", () => {
         photoGallery.hidden = !photoGallery.hidden;
         const isOpen = !photoGallery.hidden;
-        galleryButton.textContent = isOpen ? "Суреттерді жасыру" : "Үш естелікті көру";
+        galleryButton.textContent = isOpen ? "Суреттерді жасыру 📸" : "Үш естелікті көру 📸";
         galleryButton.setAttribute("aria-expanded", String(isOpen));
         if (isOpen) photoGallery.scrollIntoView({ behavior: "smooth", block: "nearest" });
       });
