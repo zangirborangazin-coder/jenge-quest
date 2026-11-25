@@ -268,7 +268,7 @@
     .quiz-title { margin: 0 0 22px; color: var(--ink); font-size: clamp(1.75rem, 5vw, 2.7rem); text-align: center; }
     .mini-game { text-align: center; }
     .mini-game-copy { max-width: 650px; margin: 0 auto 15px; color: var(--muted); font: 1rem/1.6 Arial, sans-serif; }
-    .game-feedback { min-height: 28px; margin: 12px 0; color: var(--gold); font: 600 .95rem/1.5 Arial, sans-serif; }
+    .game-feedback { position: absolute; z-index: 3; width: min(48%, 360px); margin: 0; padding: 10px 14px; border: 1px solid rgba(157,86,120,.32); border-radius: 14px; color: var(--gold); background: rgba(248,232,240,.97); box-shadow: 0 8px 22px rgba(69,35,57,.16); font: 600 .95rem/1.5 Arial, sans-serif; text-align: center; pointer-events: none; }
     .dodge-arena { position: relative; min-height: 330px; overflow: hidden; margin: 18px 0 12px; border: 1px dashed rgba(157,86,120,.48); border-radius: 20px; background: radial-gradient(ellipse at center, rgba(247,223,234,.9), rgba(232,207,220,.36)); }
     .dodge-button { position: absolute; top: 50%; left: 50%; min-width: 180px; transform: translate(-50%, -50%); white-space: nowrap; transition: left .22s ease, top .22s ease; }
     .dodge-button:hover { transform: translate(-50%, -50%); }
@@ -512,6 +512,7 @@
       .memory-layout { grid-template-columns: 1fr; }
       .memory-photo { min-height: 280px; max-height: 380px; }
       .choice-grid { grid-template-columns: 1fr; }
+      .game-feedback { width: calc(100% - 24px); }
       .dodge-arena { min-height: 350px; }
       .wifi-item { padding: 13px; }
       .button-row { flex-direction: column; }
@@ -1112,7 +1113,7 @@
       clearTimers();
       currentStage = "dodge-game";
       dodgeCount = 0;
-      dodgeLimit = 20 + Math.floor(Math.random() * 6);
+     dodgeLimit = 30 + Math.floor(Math.random() * 6);
       lastDodgeCorner = -1;
       const escapeMessages = [
         "Жоқ, тым баяу! Жеңеше, сіз бұдан да шапшаң бола аласыз ғой!",
@@ -1150,15 +1151,61 @@
           <p class="mini-game-copy">«Сыйлықты ашу» батырмасын ұстап көріңіз. Курсор жақындаған сайын ол қашады!</p>
           <div class="dodge-arena" id="dodgeArena">
             <button class="button dodge-button" id="dodgeButton" type="button">Сыйлықты ашу 🎁</button>
+            <p class="game-feedback" id="dodgeFeedback" role="status" aria-live="polite" hidden></p>
           </div>
-          <p class="game-feedback" id="dodgeFeedback" role="status" aria-live="polite" hidden></p>
         </div>`;
 
       const arena = document.querySelector("#dodgeArena");
       const button = document.querySelector("#dodgeButton");
       const feedback = document.querySelector("#dodgeFeedback");
+      let lastPointer = null;
+      let targetButtonBounds = null;
 
-      function escapeButton() {
+      function showDodgeFeedback(text, event) {
+        feedback.textContent = text;
+        feedback.hidden = false;
+        if (event && (event.pointerType || event.clientX !== 0 || event.clientY !== 0)) {
+          lastPointer = { x: event.clientX, y: event.clientY };
+        }
+
+        const arenaBounds = arena.getBoundingClientRect();
+        const buttonBounds = targetButtonBounds || button.getBoundingClientRect();
+        const cursor = lastPointer || {
+          x: buttonBounds.left + (buttonBounds.right - buttonBounds.left) / 2,
+          y: buttonBounds.top + (buttonBounds.bottom - buttonBounds.top) / 2
+        };
+        const cursorIsTop = cursor.y < arenaBounds.top + arenaBounds.height / 2;
+        const cursorIsLeft = cursor.x < arenaBounds.left + arenaBounds.width / 2;
+        const firstVertical = cursorIsTop ? "bottom" : "top";
+        const firstHorizontal = cursorIsLeft ? "right" : "left";
+        const otherVertical = firstVertical === "top" ? "bottom" : "top";
+        const otherHorizontal = firstHorizontal === "left" ? "right" : "left";
+        const candidates = [
+          { vertical: firstVertical, horizontal: firstHorizontal },
+          { vertical: firstVertical, horizontal: otherHorizontal },
+          { vertical: otherVertical, horizontal: firstHorizontal },
+          { vertical: otherVertical, horizontal: otherHorizontal }
+        ];
+
+        for (const candidate of candidates) {
+          feedback.style.top = candidate.vertical === "top" ? "12px" : "auto";
+          feedback.style.bottom = candidate.vertical === "bottom" ? "12px" : "auto";
+          feedback.style.left = candidate.horizontal === "left" ? "12px" : "auto";
+          feedback.style.right = candidate.horizontal === "right" ? "12px" : "auto";
+          const feedbackBounds = feedback.getBoundingClientRect();
+          const overlapsButton = feedbackBounds.left < buttonBounds.right
+            && feedbackBounds.right > buttonBounds.left
+            && feedbackBounds.top < buttonBounds.bottom
+            && feedbackBounds.bottom > buttonBounds.top;
+          const coversCursor = cursor.x >= feedbackBounds.left - 8
+            && cursor.x <= feedbackBounds.right + 8
+            && cursor.y >= feedbackBounds.top - 8
+            && cursor.y <= feedbackBounds.bottom + 8;
+          if (!overlapsButton && !coversCursor) return;
+        }
+      }
+
+      function escapeButton(event) {
         if (dodgeCount >= dodgeLimit) return;
 
         const gap = 12;
@@ -1179,18 +1226,23 @@
         button.style.left = `${nextCorner.left}px`;
         button.style.top = `${nextCorner.top}px`;
         button.style.transform = "none";
+        const arenaBounds = arena.getBoundingClientRect();
+        targetButtonBounds = {
+          left: arenaBounds.left + nextCorner.left,
+          top: arenaBounds.top + nextCorner.top,
+          right: arenaBounds.left + nextCorner.left + button.offsetWidth,
+          bottom: arenaBounds.top + nextCorner.top + button.offsetHeight
+        };
 
         if (dodgeCount < dodgeLimit) {
-          feedback.hidden = false;
-          feedback.textContent = escapeMessages[(dodgeCount - 1) % escapeMessages.length];
+          showDodgeFeedback(escapeMessages[(dodgeCount - 1) % escapeMessages.length], event);
           return;
         }
 
         button.classList.add("is-ready");
         const revealGift = () => {
           if (currentStage !== "dodge-game") return;
-          feedback.hidden = false;
-          feedback.textContent = surrenderMessage;
+          showDodgeFeedback(surrenderMessage, null);
           dodgeMessageTimer = window.setTimeout(() => {
             dodgeMessageTimer = null;
             if (currentStage === "dodge-game") showFinal();
@@ -1201,17 +1253,17 @@
 
       button.addEventListener("pointerenter", event => {
         if (event.pointerType !== "mouse" || dodgeCount >= dodgeLimit) return;
-        escapeButton();
+        escapeButton(event);
       });
       arena.addEventListener("pointerdown", event => {
         if (event.pointerType === "touch" && button.contains(event.target) && dodgeCount < dodgeLimit) {
           event.preventDefault();
-          escapeButton();
+          escapeButton(event);
         }
       });
-      button.addEventListener("click", () => {
+      button.addEventListener("click", event => {
         if (dodgeCount < dodgeLimit) {
-          escapeButton();
+          escapeButton(event);
           return;
         }
         showFinal();
