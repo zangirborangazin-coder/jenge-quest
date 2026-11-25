@@ -535,12 +535,12 @@
   <button class="music-toggle" id="musicToggle" type="button" aria-label="Фондық музыканы қосу" aria-pressed="false">Музыканы қосу 🎵</button>
   <span class="sr-only" id="musicStatus" aria-live="polite"></span>
   <aside class="floating-photos" aria-hidden="true">
-    <img class="floating-photo" src="1.jpg" alt="" decoding="async">
-    <img class="floating-photo" src="2.jpg" alt="" decoding="async">
-    <img class="floating-photo" src="3.jpg" alt="" decoding="async">
-    <img class="floating-photo" src="4.jpg" alt="" decoding="async">
-    <img class="floating-photo" src="5.jpg" alt="" decoding="async">
-    <img class="floating-photo" src="6.jpg" alt="" decoding="async">
+    <img class="floating-photo" src="1.jpg" data-tone="monochrome" alt="" decoding="async">
+    <img class="floating-photo" src="2.jpg" data-tone="monochrome" alt="" decoding="async">
+    <img class="floating-photo" src="3.jpg" data-tone="color" alt="" decoding="async">
+    <img class="floating-photo" src="4.jpg" data-tone="monochrome" alt="" decoding="async">
+    <img class="floating-photo" src="5.jpg" data-tone="color" alt="" decoding="async">
+    <img class="floating-photo" src="6.jpg" data-tone="color" alt="" decoding="async">
   </aside>
   <canvas id="fireworks" class="fireworks" aria-hidden="true"></canvas>
 
@@ -600,67 +600,60 @@
     ];
     const quizSteps = [
       {
-        title: "Мерекедегі ең қауіпті сөз қайсы? 🎈",
-        options: ["A) «Суретті қайта түсірейікші»", "B) «Шай ішесіз бе?»", "C) «Тағы бір тәтті жейсіз бе?»", "D) «Квестті қайтадан бастаймыз ба?»"],
-        correctOption: 2,
-        hint: "Бір үзімнен басталып, бірнеше үзімге жалғасады. 🍭",
-        success: "Дұрыс! Тәттіге әрдайым орын табылады 🍯"
-      },
-      {
-        title: "Жеңгенің телефоны сөйлей алса, не деп шағымданар еді? 📱",
+        title: "Жеңгенің телефоны сөйлей алса, не деп шағымданар еді?",
         options: ["A) «Фотоңды азайтшы!»", "B) «Мен де демалғым келеді!»", "C) «TikTok-ты жапшы!»", "D) «Мені зарядкаға қосшы!»"],
         correctOption: 1,
-        hint: "Телефон да күні бойы жұмыс істейді. 🔋",
+        hint: "Телефон да күні бойы жұмыс істейді.",
         success: "Дәл таптыңыз! Телефонға да демалыс керек 🌙"
       },
       {
-        title: "Жеңге қонаққа барғанда ең бірінші не байқайды? 👀",
+        title: "Жеңге қонаққа барғанда ең бірінші не байқайды?",
         options: ["A) Дастарханды", "B) Үйдің интерьерін", "C) Кім не киіп келгенін", "D) Бәрін байқайды, бірақ білдірмейді"],
         correctOption: 3,
-        hint: "Ештеңе назардан тыс қалмайды. 🔎",
+        hint: "Ештеңе назардан тыс қалмайды.",
         success: "Бәрін байқап қояды екенсіз! 🤫"
       },
       {
-        title: "«Мен диетадамын» деген сөз торт көрінгенде қанша секундқа созылады? 🍰",
+        title: "«Мен диетадамын» деген сөз торт көрінгенде қанша секундқа созылады?",
         options: ["A) Келесі дүйсенбіге дейін", "B) 10 секундқа", "C) 0,5 секундқа", "D) Бір күнге"],
         correctOption: 2,
-        hint: "Торттың күші диетадан басым. 🍩",
+        hint: "Торттың күші диетадан басым.",
         success: "Торт жеңді! 🍦"
       },
       {
-        title: "Жеңгенің басты супер күші қандай? 🦸‍♀️",
+        title: "Жеңгенің басты супер күші қандай?",
         options: ["A) Ақшаны тез тауып, тез жұмсау", "B) Бір көзқараспен бәрін орнына қою", "C) Бір уақытта 5 істі атқару", "D) Әулеттің бәрін өзіне бағындыру"],
         correctOption: 1,
-        hint: "Кейде бір көзқарас мың сөзден артық. 👁️",
+        hint: "Кейде бір көзқарас мың сөзден артық.",
         success: "Нағыз супер күш! 🏆"
       },
       {
-        title: "«Жай ғана қарап шығайын» деп дүкенге кіргенде не болады? 🛍️",
+        title: "«Жай ғана қарап шығайын» деп дүкенге кіргенде не болады?",
         options: ["A) Ештеңе алмай шығады", "B) Бағаларын ғана салыстырады", "C) Қолда пакетпен шығады", "D) Бір ғана зат алады"],
         correctOption: 2,
-        hint: "Дүкенге кірердегі жоспар мен шығардағы нәтиже екі түрлі. 🧾",
+        hint: "Дүкенге кірердегі жоспар мен шығардағы нәтиже екі түрлі.",
         success: "Пакетсіз шығу оңай емес екен 🧺"
       },
       {
-        title: "Жеңгенің өміріндегі ең үлкен стресс? 🌪️",
+        title: "Жеңгенің өміріндегі ең үлкен стресс?",
         options: ["A) Интернеттің өшуі", "B) Салмағының өзгеруі", "C) Сториске салатын фото таппау", "D) Kaspi-де ақша қалмауы"],
-        correctOption: 3,
-        hint: "Күнделікті өмірдегі маңызды нәрсе. 🏦",
-        success: "Kaspi-дегі баланс та маңызды ғой 📉"
+        correctOption: 2,
+        hint: "Күнделікті өмірдегі маңызды нәрсе.",
+        success: "Сториске лайық фото табу да оңай емес 📸"
       },
       {
-        title: "Егер сұрақ қиын көрінсе, бірінші не істеу керек? 🧠",
+        title: "Егер сұрақ қиын көрінсе, бірінші не істеу керек?",
         options: ["A) Кез келген батырманы басу", "B) Терең тыныс алып, күлу керек", "C) Квест авторына ренжу", "D) Сұрақты өткізіп жіберу"],
         correctOption: 1,
-        hint: "Көңілді көңіл күй — ең жақсы көмекші. 🌬️",
+        hint: "Көңілді көңіл күй — ең жақсы көмекші.",
         success: "Дұрыс! Күлімдеу бәрін жеңілдетеді 😊"
       },
       {
-        title: "Жеңгенің ең үлкен өтірігі қандай? 🤐",
+        title: "Жеңгенің ең үлкен өтірігі қандай?",
         options: ["A) «Маған ештеңе керек емес»", "B) «Бүгін ерте жатамын»", "C) «Соңғы рет сатып алдым»", "D) «Мен ашуланған жоқпын»"],
-        correctOptions: [0, 1, 2, 3],
-        hint: "Бұл сөз көбіне жаңа зат сатып алғаннан кейін айтылады. 🛒",
-        success: "Бәрі де таныс сөздер екен ғой 🎭"
+        correctOption: 3,
+        hint: "Бұл сөз көбіне жаңа зат сатып алғаннан кейін айтылады.",
+        success: "Дұрыс таптыңыз! Ашуланбай-ақ бәрін түсіндіруге болады ғой 🤭"
       }
     ];
     const otherChoiceJokes = [
@@ -721,26 +714,28 @@
       const leftMax = Math.max(8, shellLeft - photoWidth + 26);
       const rightMin = Math.max(8, shellRight - 26);
       const rightMax = Math.max(rightMin, viewportWidth - photoWidth - 8);
-      const verticalSlots = {
-        left: shuffle([.08, .4, .72]),
-        right: shuffle([.08, .4, .72])
-      };
-      const sides = shuffle(["left", "left", "left", "right", "right", "right"]);
+      const monochromePhotos = shuffle(floatingPhotos.filter(photo => photo.dataset.tone === "monochrome"));
+      const colorPhotos = shuffle(floatingPhotos.filter(photo => photo.dataset.tone === "color"));
+      const verticalSlots = shuffle([.08, .4, .72]);
+      const monochromeSides = shuffle(["left", "left", "right"]);
+      const maxTop = Math.max(8, viewportHeight - photoHeight - 8);
 
-      shuffle([...floatingPhotos]).forEach((photo, index) => {
-        const side = sides[index];
-        const slot = verticalSlots[side].pop();
+      for (let index = 0; index < Math.min(monochromePhotos.length, colorPhotos.length); index += 1) {
         const top = Math.min(
-          Math.max(8, viewportHeight - photoHeight - 8),
-          Math.max(8, viewportHeight * slot + (Math.random() - .5) * viewportHeight * .1)
+          maxTop,
+          Math.max(8, viewportHeight * verticalSlots[index] + (Math.random() - .5) * viewportHeight * .07)
         );
-        const x = side === "left"
-          ? 8 + Math.random() * (leftMax - 8)
-          : rightMin + Math.random() * (rightMax - rightMin);
+        const monochromeSide = monochromeSides[index];
+        const leftPhoto = monochromeSide === "left" ? monochromePhotos[index] : colorPhotos[index];
+        const rightPhoto = monochromeSide === "right" ? monochromePhotos[index] : colorPhotos[index];
+        const left = 8 + Math.random() * (leftMax - 8);
+        const right = rightMin + Math.random() * (rightMax - rightMin);
 
-        photo.style.left = `${x}px`;
-        photo.style.top = `${top}px`;
-      });
+        leftPhoto.style.left = `${left}px`;
+        leftPhoto.style.top = `${top}px`;
+        rightPhoto.style.left = `${right}px`;
+        rightPhoto.style.top = `${top}px`;
+      }
     }
 
     function updateMusicToggle() {
@@ -828,7 +823,7 @@
       otherChoiceAttempts = 0;
       const isMemory = !isQuiz && Boolean(step.image);
       const content = `
-        ${isQuiz ? '<h1 class="quiz-title">Жеңгеге арналған викторина 🪄</h1>' : ""}
+        ${isQuiz ? '<h1 class="quiz-title">Жеңгеге арналған викторина</h1>' : ""}
         <div class="progress-wrap" aria-label="${isQuiz ? "Викторина барысы" : "Квест барысы ✨"}">
           <div class="progress-heading"><span>${isQuiz ? `Сұрақ ${index + 1}` : `${index + 1}-ші блок`}</span><span>${index + 1} / ${stepList.length}</span></div>
           <div class="heart-progress" style="--heart-count:${stepList.length}" role="img" aria-label="${index + 1} / ${stepList.length} ${isQuiz ? "сұрақ" : "блок"} орындалды">${stepList.map((_, heartIndex) => `<span class="progress-heart${heartIndex <= index ? " is-filled" : ""}${heartIndex === index ? " is-current" : ""}" aria-hidden="true">${heartIndex <= index ? "♥" : "♡"}</span>`).join("")}</div>
