@@ -237,6 +237,10 @@
     .choice-button:hover { transform: translateY(-2px); border-color: var(--gold); background: rgba(213,139,167,.3); }
     .choice-button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
     .choice-button:active { transform: scale(.98); }
+    .choice-button.is-correct { border-color: var(--gold); color: #fff8fb; background: linear-gradient(110deg, #a75578, #c97696); box-shadow: 0 8px 22px rgba(140,62,97,.2); animation: answer-flight .7s cubic-bezier(.2,.8,.2,1) both; }
+    .choice-button:disabled { cursor: default; }
+    .correct-answer-slot { display: flex; min-height: 58px; justify-content: center; margin: 12px auto 0; }
+    .advance-note { display: block; margin-top: 8px; color: var(--muted); font-size: .84rem; }
 
     .answer-input {
       width: 100%;
@@ -360,6 +364,13 @@
     .gift-bow::before { left: 3px; transform: rotate(25deg); }
     .gift-bow::after { right: 3px; transform: rotate(65deg) scaleX(-1); }
 
+    .gallery-button { margin: 2px auto 0; animation: arrive .45s ease both; }
+    .photo-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 25px; text-align: left; }
+    .photo-gallery[hidden] { display: none; }
+    .gallery-photo { min-width: 0; margin: 0; overflow: hidden; border: 1px solid rgba(157,86,120,.35); border-radius: 15px; background: rgba(232,207,220,.62); box-shadow: 0 8px 22px rgba(69,35,57,.12); }
+    .gallery-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+    .gallery-photo figcaption { padding: 10px 12px 12px; color: #69445b; font: .78rem/1.4 Arial, sans-serif; text-align: center; }
+
     .fireworks {
       position: fixed;
       z-index: 20;
@@ -395,12 +406,19 @@
       to { opacity: 1; transform: translate(-50%, 0) scale(1); }
     }
 
+    @keyframes answer-flight {
+      0% { opacity: .4; transform: translateY(-34px) scale(.9); }
+      68% { opacity: 1; transform: translateY(5px) scale(1.04); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     @media (max-width: 650px) {
       .page { padding: 24px 14px; }
       .card { border-radius: 22px; }
       .gift-scene { height: 345px; }
       .gift-note { bottom: 79px; width: 96%; padding: 18px 16px; }
       .gift-box { transform: translateX(-50%) scale(.9); transform-origin: bottom center; }
+      .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .memory-layout { grid-template-columns: 1fr; }
       .memory-photo { min-height: 280px; max-height: 380px; }
       .choice-grid { grid-template-columns: 1fr; }
@@ -411,6 +429,7 @@
 
     @media (max-width: 390px) {
       .memory-photo { min-height: 245px; }
+      .photo-gallery { grid-template-columns: 1fr; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -430,21 +449,24 @@
   <script>
     const steps = [
       {
-        title: "Аты-жөніңіз",
-        question: "Квестті бастамас бұрын танысайық: толық аты-жөніңізді жазыңыз.",
-        type: "name",
-        success: "Танысқаныма қуаныштымын! Келесі блок ашылуда..."
+        title: "Квест кімге арналған?",
+        question: "Бұл туған күн квесті кімге арналып отыр?",
+        options: ["Жеңешеге", "Ағаға", "Әжеге", "Бүкіл қонақтарға"],
+        correctOption: 0,
+        success: "Дұрыс! Бұл квест сізге арнап дайындалды."
       },
       {
         title: "Туған күн",
         question: "Бүгінгі ерекше күн — сіздің туған күніңіз қай күн?",
-        answers: ["27.11", "27 қараша", "27.11.2026"],
+        options: ["8 наурыз", "22 мамыр", "27 қараша", "1 тамыз"],
+        correctOption: 2,
         success: "Туған күніңізбен құттықтаймыз! Енді естелік сұрақтарға көшеміз."
       },
       {
         title: "Ерекше кездесу",
         question: "Бір күні, бір жерде — бәріміз бірге бас қосып, үлкен отбасы болып жақынырақ танысқан едік. Бұл ерекше кездесу қай күні болды?",
-        answers: ["08.03.2019", "08.03", "8 наурыз", "сегіз наурыз"],
+        options: ["08.03.2019", "22.05.2022", "01.08.2022", "27.11.2026"],
+        correctOption: 0,
         image: "08.03.2019.jpg",
         imageAlt: "Отбасының гүл сыйлаған ерекше кездесудегі суреті",
         caption: "Бәріміз алғаш жақындасқан күн",
@@ -454,7 +476,8 @@
       {
         title: "Ұсыныс жасаған күн",
         question: "Ағам өміріндегі ең маңызды қадамдардың бірін жасап, сізге жүрекжарды ұсыныс жасаған күн қай күн?",
-        answers: ["22.05.2022", "22.05", "22 мамыр"],
+        options: ["08.03.2019", "22.05.2022", "01.08.2022", "27.11.2026"],
+        correctOption: 1,
         image: "22.05.2022.jpg",
         imageAlt: "Жұптың кешкі кездесу сәті",
         caption: "Ортақ тарихтың алғашқы тарауы",
@@ -482,12 +505,15 @@
     let countdownTimer = null;
     let hintDelayTimer = null;
     let advanceTimer = null;
+    let advanceCountdownTimer = null;
+    let galleryRevealTimer = null;
     let fireworksFrame = null;
     let fireworksEndTime = 0;
     let particles = [];
     let rockets = [];
 
     function renderWelcome() {
+      clearTimers();
       currentStep = -1;
       app.innerHTML = `
         <div class="intro">
@@ -541,34 +567,22 @@
             <div class="memory-content">${stepContent(step, index)}</div>
           </div>` : stepContent(step, index)}`;
       app.innerHTML = content;
-      const input = document.querySelector("#answerInput");
-      if (input) input.focus({ preventScroll: true });
       const answerForm = document.querySelector("#answerForm");
-      if (!step.options) {
-        answerForm.addEventListener("submit", (event) => {
-          event.preventDefault();
-          checkAnswer(step);
-        });
-      } else {
-        const firstChoice = answerForm.querySelector(".choice-button");
-        if (firstChoice) firstChoice.focus({ preventScroll: true });
-        answerForm.querySelectorAll(".choice-button").forEach((button) => {
-          button.addEventListener("click", () => checkChoice(step, Number(button.dataset.choice)));
-        });
-      }
+      const firstChoice = answerForm.querySelector(".choice-button");
+      if (firstChoice) firstChoice.focus({ preventScroll: true });
+      answerForm.querySelectorAll(".choice-button").forEach((button) => {
+        button.addEventListener("click", () => checkChoice(step, Number(button.dataset.choice), button));
+      });
       const hintButton = document.querySelector("#hintButton");
       if (hintButton) hintButton.addEventListener("click", () => requestHint(step.hint));
       if (step.hint) startHintTimer(step.hint);
     }
 
     function stepContent(step, index) {
-      const placeholder = step.type === "name" ? "Аты-жөніңіз" : "Жауабыңызды жазыңыз";
       const answerControl = step.options
-        ? `<p class="choice-instruction">Дұрыс күнді таңдаңыз:</p>
+        ? `<p class="choice-instruction">Дұрыс жауапты таңдаңыз:</p>
            <div class="choice-grid">${step.options.map((option, optionIndex) => `<button class="choice-button" type="button" data-choice="${optionIndex}">${option}</button>`).join("")}</div>`
-        : `<label class="sr-only" for="answerInput">${placeholder}</label>
-           <input class="answer-input" id="answerInput" name="answer" type="text" placeholder="${placeholder}" autocomplete="off" required>
-           <button class="button" id="submitButton" type="submit">Жауапты тексеру <span aria-hidden="true">→</span></button>`;
+        : "";
       const hintButton = step.hint
         ? `<button class="button secondary hint-button" id="hintButton" type="button">Подсказка алу</button>`
         : "";
@@ -583,30 +597,11 @@
           <p class="hint" id="hint" role="status" hidden></p>
           <p class="timer" id="timer" aria-live="polite" hidden></p>
         </form>
-        <p class="success-message" id="successMessage" role="status" hidden></p>`;
+        <p class="success-message" id="successMessage" role="status" hidden></p>
+        <div class="correct-answer-slot" id="correctAnswerSlot" hidden></div>`;
     }
 
-    function normalize(value) {
-      return value.toLocaleLowerCase("kk-KZ").replace(/[\\s.,/\\-]+/g, "").trim();
-    }
-
-    function checkAnswer(step) {
-      const input = document.querySelector("#answerInput");
-      const answer = input.value.trim();
-      const feedback = document.querySelector("#feedback");
-      if (step.type === "name" ? answer.length < 2 : !step.answers.some((accepted) => normalize(accepted) === normalize(answer))) {
-        feedback.textContent = step.type === "name"
-          ? "Аты-жөніңізді толық жазыңыз."
-          : "Бұл жауап сәйкес келмеді. Тағы бір рет ойланып көріңіз.";
-        feedback.hidden = false;
-        input.focus();
-        return;
-      }
-
-      acceptAnswer(step);
-    }
-
-    function checkChoice(step, choiceIndex) {
+    function checkChoice(step, choiceIndex, selectedButton) {
       if (choiceIndex !== step.correctOption) {
         const feedback = document.querySelector("#feedback");
         feedback.textContent = "Бұл таңдау дұрыс емес. Тағы бір рет ойланып көріңіз.";
@@ -614,22 +609,57 @@
         return;
       }
 
-      acceptAnswer(step);
+      acceptAnswer(step, selectedButton);
     }
 
-    function acceptAnswer(step) {
+    function acceptAnswer(step, selectedButton) {
       clearTimers();
-      document.querySelector("#answerForm").hidden = true;
+      const answerForm = document.querySelector("#answerForm");
+      const correctAnswerSlot = document.querySelector("#correctAnswerSlot");
+      if (selectedButton) {
+        answerForm.querySelector(".choice-grid").hidden = true;
+        selectedButton.disabled = true;
+        selectedButton.classList.add("is-correct");
+        correctAnswerSlot.hidden = false;
+        correctAnswerSlot.appendChild(selectedButton);
+        const instruction = answerForm.querySelector(".choice-instruction");
+        if (instruction) instruction.hidden = true;
+        const hintButton = document.querySelector("#hintButton");
+        if (hintButton) hintButton.hidden = true;
+        const feedback = document.querySelector("#feedback");
+        feedback.hidden = true;
+        document.querySelector("#hint").hidden = true;
+        document.querySelector("#timer").hidden = true;
+      }
       const photo = document.querySelector(".memory-photo");
       if (photo) photo.classList.add("is-revealed");
       const message = document.querySelector("#successMessage");
-      message.innerHTML = `<strong>${step.success}</strong>`;
+      const pauseText = step.image
+        ? "Суретті тамашалаңыз! Келесі блок 5 секундтан кейін ашылады."
+        : "Келесі блок 5 секундтан кейін ашылады.";
+      message.innerHTML = `<strong>${step.success}</strong><span class="advance-note">${pauseText}</span>`;
       message.hidden = false;
+      let seconds = 5;
+      const advanceNote = message.querySelector(".advance-note");
+      advanceCountdownTimer = window.setInterval(() => {
+        seconds -= 1;
+        if (seconds <= 0) {
+          window.clearInterval(advanceCountdownTimer);
+          advanceCountdownTimer = null;
+          advanceNote.textContent = step.image
+            ? "Суретті тамашалаңыз! Келесі блок ашылуда..."
+            : "Келесі блок ашылуда...";
+        } else {
+          advanceNote.textContent = step.image
+            ? `Суретті тамашалаңыз! Келесі блок ${seconds} секундтан кейін ашылады.`
+            : `Келесі блок ${seconds} секундтан кейін ашылады.`;
+        }
+      }, 1000);
       advanceTimer = window.setTimeout(() => {
         advanceTimer = null;
         if (currentStep === steps.length - 1) showFinal();
         else showStep(currentStep + 1);
-      }, 3000);
+      }, 5000);
     }
 
     function startHintTimer(hintText) {
@@ -689,10 +719,14 @@
     function clearTimers() {
       if (countdownTimer !== null) window.clearInterval(countdownTimer);
       if (hintDelayTimer !== null) window.clearInterval(hintDelayTimer);
+      if (advanceCountdownTimer !== null) window.clearInterval(advanceCountdownTimer);
       if (advanceTimer !== null) window.clearTimeout(advanceTimer);
+      if (galleryRevealTimer !== null) window.clearTimeout(galleryRevealTimer);
       countdownTimer = null;
       hintDelayTimer = null;
+      advanceCountdownTimer = null;
       advanceTimer = null;
+      galleryRevealTimer = null;
     }
 
     function showFinal() {
@@ -713,12 +747,40 @@
               </div>
             </div>
           </div>
+          <button class="button gallery-button" id="galleryButton" type="button" aria-controls="photoGallery" aria-expanded="false" hidden>Үш естелікті көру</button>
           <button class="button secondary" id="againButton" type="button">Квестті қайта бастау</button>
+          <div class="photo-gallery" id="photoGallery" aria-label="Естелік суреттер" hidden>
+            <figure class="gallery-photo">
+              <img src="08.03.2019.jpg" alt="Отбасының гүл сыйлаған ерекше кездесудегі суреті">
+              <figcaption>Бәріміз алғаш жақындасқан күн</figcaption>
+            </figure>
+            <figure class="gallery-photo">
+              <img src="22.05.2022.jpg" alt="Жұптың кешкі кездесу сәті">
+              <figcaption>Ортақ тарихтың алғашқы тарауы</figcaption>
+            </figure>
+            <figure class="gallery-photo">
+              <img src="01.08.2022.jpg" alt="Той күніндегі жас жұбайлар мен жақындары">
+              <figcaption>Бақытқа толы той күні</figcaption>
+            </figure>
+          </div>
         </div>`;
       document.querySelector("#againButton").addEventListener("click", () => {
         stopFireworks();
         renderWelcome();
       });
+      const galleryButton = document.querySelector("#galleryButton");
+      const photoGallery = document.querySelector("#photoGallery");
+      galleryButton.addEventListener("click", () => {
+        photoGallery.hidden = !photoGallery.hidden;
+        const isOpen = !photoGallery.hidden;
+        galleryButton.textContent = isOpen ? "Суреттерді жасыру" : "Үш естелікті көру";
+        galleryButton.setAttribute("aria-expanded", String(isOpen));
+        if (isOpen) photoGallery.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+      galleryRevealTimer = window.setTimeout(() => {
+        galleryButton.hidden = false;
+        galleryRevealTimer = null;
+      }, 2100);
       startFireworks();
     }
 
