@@ -222,7 +222,10 @@
     .answer-form { display: grid; gap: 13px; }
     .choice-instruction { margin: 0; color: var(--muted); font: .9rem/1.5 Arial, sans-serif; }
     .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .choice-slot { min-width: 0; min-height: 52px; }
     .choice-button {
+      width: 100%;
+      height: 100%;
       min-height: 52px;
       padding: 12px 14px;
       border: 1px solid rgba(157,86,120,.4);
@@ -231,12 +234,13 @@
       background: rgba(232,207,220,.72);
       cursor: pointer;
       font: 600 .92rem/1.35 Arial, sans-serif;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      transition: transform .32s cubic-bezier(.2,.8,.2,1), border-color .18s ease, background .18s ease;
     }
 
     .choice-button:hover { transform: translateY(-2px); border-color: var(--gold); background: rgba(213,139,167,.3); }
     .choice-button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
     .choice-button:active { transform: scale(.98); }
+    .choice-grid.is-shuffling .choice-button { cursor: wait; }
     .choice-button.is-correct { border-color: var(--gold); color: #fff8fb; background: linear-gradient(110deg, #a75578, #c97696); box-shadow: 0 8px 22px rgba(140,62,97,.2); animation: answer-flight .7s cubic-bezier(.2,.8,.2,1) both; }
     .choice-button:disabled { cursor: default; }
     .correct-answer-slot { display: flex; min-height: 58px; justify-content: center; margin: 12px auto 0; }
@@ -453,6 +457,7 @@
         question: "Бұл туған күн квесті кімге арналып отыр?",
         options: ["Жеңешеге", "Ағаға", "Әжеге", "Бүкіл қонақтарға"],
         correctOption: 0,
+        shuffleCount: 2,
         success: "Дұрыс! Бұл квест сізге арнап дайындалды."
       },
       {
@@ -460,6 +465,7 @@
         question: "Бүгінгі ерекше күн — сіздің туған күніңіз қай күн?",
         options: ["8 наурыз", "22 мамыр", "27 қараша", "1 тамыз"],
         correctOption: 2,
+        shuffleCount: 5,
         success: "Туған күніңізбен құттықтаймыз! Енді естелік сұрақтарға көшеміз."
       },
       {
@@ -467,6 +473,7 @@
         question: "Бір күні, бір жерде — бәріміз бірге бас қосып, үлкен отбасы болып жақынырақ танысқан едік. Бұл ерекше кездесу қай күні болды?",
         options: ["08.03.2019", "22.05.2022", "01.08.2022", "27.11.2026"],
         correctOption: 0,
+        shuffleCount: 3,
         image: "08.03.2019.jpg",
         imageAlt: "Отбасының гүл сыйлаған ерекше кездесудегі суреті",
         caption: "Бәріміз алғаш жақындасқан күн",
@@ -478,6 +485,7 @@
         question: "Ағам өміріндегі ең маңызды қадамдардың бірін жасап, сізге жүрекжарды ұсыныс жасаған күн қай күн?",
         options: ["08.03.2019", "22.05.2022", "01.08.2022", "27.11.2026"],
         correctOption: 1,
+        shuffleCount: 4,
         image: "22.05.2022.jpg",
         imageAlt: "Жұптың кешкі кездесу сәті",
         caption: "Ортақ тарихтың алғашқы тарауы",
@@ -488,6 +496,7 @@
         question: "Қос жүрек қосылып, үлкен той өткен ең жарқын күн қай күн?",
         options: ["08.03.2019", "22.05.2022", "27.11.2026", "01.08.2022"],
         correctOption: 3,
+        shuffleCount: 6,
         image: "01.08.2022.jpg",
         imageAlt: "Той күніндегі жас жұбайлар мен жақындары",
         caption: "Бақытқа толы той күні",
@@ -507,6 +516,8 @@
     let advanceTimer = null;
     let advanceCountdownTimer = null;
     let galleryRevealTimer = null;
+    let shuffleTimer = null;
+    let shuffleMovesLeft = 0;
     let fireworksFrame = null;
     let fireworksEndTime = 0;
     let particles = [];
@@ -552,6 +563,7 @@
       clearTimers();
       currentStep = index;
       const step = steps[index];
+      shuffleMovesLeft = step.shuffleCount;
       const isMemory = Boolean(step.image);
       const content = `
         <div class="progress-wrap" aria-label="Квест барысы">
@@ -580,8 +592,8 @@
 
     function stepContent(step, index) {
       const answerControl = step.options
-        ? `<p class="choice-instruction">Дұрыс жауапты таңдаңыз:</p>
-           <div class="choice-grid">${step.options.map((option, optionIndex) => `<button class="choice-button" type="button" data-choice="${optionIndex}">${option}</button>`).join("")}</div>`
+        ? `<p class="choice-instruction">Дұрыс жауапты тауып басыңыз — ол қашып кетуі мүмкін!</p>
+           <div class="choice-grid">${step.options.map((option, optionIndex) => `<div class="choice-slot"><button class="choice-button" type="button" data-choice="${optionIndex}">${option}</button></div>`).join("")}</div>`
         : "";
       const hintButton = step.hint
         ? `<button class="button secondary hint-button" id="hintButton" type="button">Подсказка алу</button>`
@@ -604,12 +616,71 @@
     function checkChoice(step, choiceIndex, selectedButton) {
       if (choiceIndex !== step.correctOption) {
         const feedback = document.querySelector("#feedback");
-        feedback.textContent = "Бұл таңдау дұрыс емес. Тағы бір рет ойланып көріңіз.";
+        feedback.textContent = "Қате жауап! Бұл нұсқа алынып тасталды. Қалғандарын байқап көріңіз.";
         feedback.hidden = false;
+        selectedButton.parentElement.replaceChildren();
+        return;
+      }
+
+      if (shuffleMovesLeft > 0) {
+        moveCorrectAnswer(selectedButton);
         return;
       }
 
       acceptAnswer(step, selectedButton);
+    }
+
+    function moveCorrectAnswer(selectedButton) {
+      const grid = document.querySelector(".choice-grid");
+      const feedback = document.querySelector("#feedback");
+      grid.classList.add("is-shuffling");
+      grid.querySelectorAll(".choice-button").forEach((button) => {
+        button.disabled = true;
+      });
+      shuffleMovesLeft -= 1;
+      feedback.textContent = shuffleMovesLeft > 0
+        ? `Дұрыс! Тағы ${shuffleMovesLeft} рет қашады — ұстап көріңіз!`
+        : "Соңғы рет қашты! Енді дұрыс жауапты қайта басып, блокты ашыңыз.";
+      feedback.hidden = false;
+      swapChoicePositions(grid, selectedButton);
+      shuffleTimer = window.setTimeout(() => {
+        grid.classList.remove("is-shuffling");
+        grid.querySelectorAll(".choice-button").forEach((button) => {
+          button.disabled = false;
+        });
+        selectedButton.focus({ preventScroll: true });
+        shuffleTimer = null;
+      }, 400);
+    }
+
+    function swapChoicePositions(grid, selectedButton) {
+      const slots = Array.from(grid.querySelectorAll(".choice-slot"));
+      const sourceSlot = selectedButton.parentElement;
+      const occupiedSlots = slots.filter((slot) => slot !== sourceSlot && slot.querySelector(".choice-button"));
+      const availableSlots = occupiedSlots.length
+        ? occupiedSlots
+        : slots.filter((slot) => slot !== sourceSlot);
+      if (availableSlots.length === 0) return;
+
+      const targetSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)];
+      const otherButton = targetSlot.querySelector(".choice-button");
+      const movingButtons = otherButton ? [selectedButton, otherButton] : [selectedButton];
+      const startPositions = new Map(movingButtons.map((button) => [button, button.getBoundingClientRect()]));
+
+      if (otherButton) sourceSlot.appendChild(otherButton);
+      targetSlot.appendChild(selectedButton);
+
+      movingButtons.forEach((button) => {
+        const start = startPositions.get(button);
+        const end = button.getBoundingClientRect();
+        button.style.transition = "none";
+        button.style.transform = `translate(${start.left - end.left}px, ${start.top - end.top}px)`;
+        button.getBoundingClientRect();
+        window.requestAnimationFrame(() => {
+          button.style.transition = "";
+          button.style.transform = "";
+        });
+      });
     }
 
     function acceptAnswer(step, selectedButton) {
@@ -722,11 +793,14 @@
       if (advanceCountdownTimer !== null) window.clearInterval(advanceCountdownTimer);
       if (advanceTimer !== null) window.clearTimeout(advanceTimer);
       if (galleryRevealTimer !== null) window.clearTimeout(galleryRevealTimer);
+      if (shuffleTimer !== null) window.clearTimeout(shuffleTimer);
       countdownTimer = null;
       hintDelayTimer = null;
       advanceCountdownTimer = null;
       advanceTimer = null;
       galleryRevealTimer = null;
+      shuffleTimer = null;
+      shuffleMovesLeft = 0;
     }
 
     function showFinal() {
