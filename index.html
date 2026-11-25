@@ -62,7 +62,7 @@
 
     .floating-photo {
       position: absolute;
-      width: clamp(78px, 8vw, 126px);
+      width: clamp(96px, 10vw, 150px);
       aspect-ratio: 4 / 5;
       object-fit: cover;
       border: 4px solid rgba(255, 246, 250, .88);
@@ -74,12 +74,6 @@
 
     .floating-photo:nth-child(odd) { animation: float-photo-left 6.2s ease-in-out infinite; }
     .floating-photo:nth-child(even) { animation: float-photo-right 6.8s ease-in-out infinite; }
-    .floating-photo:nth-child(1) { top: 10%; left: max(8px, calc((100vw - 850px) / 2 - 140px)); }
-    .floating-photo:nth-child(2) { top: 13%; right: max(8px, calc((100vw - 850px) / 2 - 140px)); animation-delay: -1.1s; }
-    .floating-photo:nth-child(3) { top: 40%; left: max(8px, calc((100vw - 850px) / 2 - 140px)); animation-delay: -2.2s; }
-    .floating-photo:nth-child(4) { top: 43%; right: max(8px, calc((100vw - 850px) / 2 - 140px)); animation-delay: -3.1s; }
-    .floating-photo:nth-child(5) { bottom: 9%; left: max(8px, calc((100vw - 850px) / 2 - 140px)); animation-delay: -4s; }
-    .floating-photo:nth-child(6) { right: max(8px, calc((100vw - 850px) / 2 - 140px)); bottom: 11%; animation-delay: -2.7s; }
 
     .music-toggle {
       position: fixed;
@@ -684,6 +678,7 @@
     const musicToggle = document.querySelector("#musicToggle");
     const musicStatus = document.querySelector("#musicStatus");
     const canvas = document.querySelector("#fireworks");
+    const floatingPhotos = Array.from(document.querySelectorAll(".floating-photo"));
     const ctx = canvas.getContext("2d");
     const wifiPassword = "2711";
     const fireworkColors = ["#bd2f68", "#78449f", "#a86618", "#28788a", "#c63d66", "#603b91"];
@@ -703,6 +698,50 @@
     let fireworksEndTime = 0;
     let particles = [];
     let rockets = [];
+    let floatingPhotoResizeTimer = null;
+
+    function shuffle(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    }
+
+    function positionFloatingPhotos() {
+      if (window.innerWidth <= 1000) return;
+
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const shellWidth = document.querySelector(".shell").getBoundingClientRect().width;
+      const photoWidth = Math.min(150, Math.max(96, viewportWidth * .1));
+      const photoHeight = photoWidth * 1.25;
+      const shellLeft = (viewportWidth - shellWidth) / 2;
+      const shellRight = shellLeft + shellWidth;
+      const leftMax = Math.max(8, shellLeft - photoWidth + 26);
+      const rightMin = Math.max(8, shellRight - 26);
+      const rightMax = Math.max(rightMin, viewportWidth - photoWidth - 8);
+      const verticalSlots = {
+        left: shuffle([.08, .4, .72]),
+        right: shuffle([.08, .4, .72])
+      };
+      const sides = shuffle(["left", "left", "left", "right", "right", "right"]);
+
+      shuffle([...floatingPhotos]).forEach((photo, index) => {
+        const side = sides[index];
+        const slot = verticalSlots[side].pop();
+        const top = Math.min(
+          Math.max(8, viewportHeight - photoHeight - 8),
+          Math.max(8, viewportHeight * slot + (Math.random() - .5) * viewportHeight * .1)
+        );
+        const x = side === "left"
+          ? 8 + Math.random() * (leftMax - 8)
+          : rightMin + Math.random() * (rightMax - rightMin);
+
+        photo.style.left = `${x}px`;
+        photo.style.top = `${top}px`;
+      });
+    }
 
     function updateMusicToggle() {
       const isPlaying = !backgroundMusic.paused && !backgroundMusic.ended;
@@ -1239,9 +1278,12 @@
     }
 
     window.addEventListener("resize", () => {
+      window.clearTimeout(floatingPhotoResizeTimer);
+      floatingPhotoResizeTimer = window.setTimeout(positionFloatingPhotos, 120);
       if (currentStep === steps.length) resizeCanvas();
     });
 
+    positionFloatingPhotos();
     backgroundMusic.volume = .35;
     backgroundMusic.addEventListener("play", updateMusicToggle);
     backgroundMusic.addEventListener("pause", updateMusicToggle);
