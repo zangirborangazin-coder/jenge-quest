@@ -14,7 +14,7 @@
       --muted: #715c70;
       --gold: #a75578;
       --rose: #c97696;
-      --panel: rgba(248, 232, 240, .91);
+      --panel: rgba(255, 251, 253, .97);
       --line: rgba(114, 65, 91, .22);
     }
 
@@ -28,31 +28,35 @@
       color: var(--ink);
       font-family: Georgia, "Times New Roman", serif;
       background:
-        radial-gradient(ellipse at 12% 18%, rgba(181, 104, 143, .52), transparent 34rem),
-        radial-gradient(ellipse at 88% 82%, rgba(142, 104, 158, .46), transparent 34rem),
-        linear-gradient(135deg, #d9afc2, #c7a2bc 52%, #dfb9c3);
+        radial-gradient(circle at 50% 50%, rgba(255, 248, 251, .18), transparent 32%),
+        linear-gradient(135deg, #d9b1c1 0%, #cdaabd 52%, #ddbcca 100%);
+      background-size: 100% 100%, 220% 220%;
       overflow-x: hidden;
+      animation: background-flow 8s ease-in-out infinite alternate;
     }
 
-    body::before, body::after {
+    body::before {
       position: fixed;
-      z-index: -1;
-      width: 19rem;
-      height: 19rem;
-      border-radius: 50%;
+      z-index: 0;
+      inset: -20%;
       background:
-        radial-gradient(ellipse 18% 31% at 50% 22%, rgba(149, 75, 111, .24) 75%, transparent 78%),
-        radial-gradient(ellipse 18% 31% at 72% 41%, rgba(149, 75, 111, .21) 75%, transparent 78%),
-        radial-gradient(ellipse 18% 31% at 64% 68%, rgba(149, 75, 111, .21) 75%, transparent 78%),
-        radial-gradient(ellipse 18% 31% at 36% 68%, rgba(149, 75, 111, .21) 75%, transparent 78%),
-        radial-gradient(ellipse 18% 31% at 28% 41%, rgba(149, 75, 111, .21) 75%, transparent 78%),
-        radial-gradient(circle at 50% 49%, rgba(127, 67, 97, .26) 0 7%, transparent 8%);
+        radial-gradient(ellipse at 18% 35%, rgba(255, 248, 251, .38), transparent 20%),
+        radial-gradient(ellipse at 82% 68%, rgba(155, 87, 119, .18), transparent 22%);
       content: "";
       pointer-events: none;
+      animation: soft-light-flow 9s ease-in-out infinite alternate;
     }
 
-    body::before { top: -11rem; right: 8%; }
-    body::after { bottom: -13rem; left: 5%; width: 25rem; height: 25rem; }
+    @keyframes background-flow {
+      0% { background-position: 50% 50%, 0% 50%; }
+      50% { background-position: 50% 50%, 100% 50%; }
+      100% { background-position: 50% 50%, 0% 50%; }
+    }
+
+    @keyframes soft-light-flow {
+      0% { transform: translate3d(-8%, -5%, 0) scale(.96) rotate(-2deg); }
+      100% { transform: translate3d(8%, 5%, 0) scale(1.12) rotate(3deg); }
+    }
 
     .floating-photos {
       position: fixed;
@@ -118,7 +122,7 @@
     .eyebrow {
       margin: 0 0 18px;
       color: var(--gold);
-      font: 600 .72rem/1.4 Arial, sans-serif;
+      font: 600 .82rem/1.4 Arial, sans-serif;
       letter-spacing: .24em;
       text-align: center;
       text-transform: uppercase;
@@ -126,8 +130,8 @@
 
     h1, h2, p { margin-top: 0; }
     h1, h2 { font-weight: 400; }
-    h1 { margin-bottom: 14px; font-size: clamp(2.5rem, 7vw, 4.7rem); line-height: 1.03; }
-    h2 { margin-bottom: 14px; font-size: clamp(2rem, 5vw, 3.15rem); line-height: 1.1; }
+    h1 { margin-bottom: 14px; font-size: clamp(3.2rem, 8vw, 5.8rem); line-height: 1.03; }
+    h2 { margin-bottom: 14px; font-size: clamp(2.5rem, 5.5vw, 4rem); line-height: 1.1; }
 
     .card {
       position: relative;
@@ -135,7 +139,7 @@
       padding: clamp(25px, 6vw, 58px);
       border: 1px solid rgba(157, 86, 120, .34);
       border-radius: 28px;
-      background: var(--panel);
+      background: linear-gradient(145deg, #fffefe 0%, #fffafd 100%);
       box-shadow: 0 28px 90px rgba(69, 35, 57, .22), inset 0 1px rgba(255,255,255,.72);
       backdrop-filter: blur(18px);
       animation: arrive .55s ease both;
@@ -156,7 +160,7 @@
       max-width: 650px;
       margin: 0 auto 26px;
       color: var(--muted);
-      font: 1.05rem/1.75 Arial, sans-serif;
+      font: 1.25rem/1.7 Arial, sans-serif;
     }
 
     .wifi {
@@ -171,52 +175,50 @@
       padding: 15px 17px;
       border: 1px solid var(--line);
       border-radius: 15px;
-      background: rgba(232, 207, 220, .66);
+      background: #fff9fc;
     }
 
     .wifi-label {
       display: block;
       margin-bottom: 6px;
       color: var(--muted);
-      font: .68rem Arial, sans-serif;
+      font: .78rem Arial, sans-serif;
       letter-spacing: .12em;
       text-transform: uppercase;
     }
 
-    .wifi-value { color: #5f3b53; font: 600 .98rem/1.35 Arial, sans-serif; overflow-wrap: anywhere; }
-    .wifi-hint { margin: 0 0 28px; color: var(--gold); font: .9rem/1.5 Arial, sans-serif; }
+    .wifi-value { color: #5f3b53; font: 600 1.12rem/1.35 Arial, sans-serif; overflow-wrap: anywhere; }
+    .wifi-hint { margin: 0 0 28px; color: var(--gold); font: 1.02rem/1.5 Arial, sans-serif; }
     .wifi-form { display: grid; max-width: 400px; gap: 12px; margin: 0 auto; }
-    .welcome { margin: 22px 0 0; color: var(--gold); font-size: 1.05rem; line-height: 1.6; }
+    .welcome { margin: 22px 0 0; color: var(--gold); font-size: 1.2rem; line-height: 1.6; }
 
     .progress-wrap { margin-bottom: 30px; }
     .progress-heading {
+      position: relative;
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
       color: var(--muted);
-      font: .76rem Arial, sans-serif;
+      font: .9rem Arial, sans-serif;
       letter-spacing: .06em;
     }
 
-    .heart-progress { position: relative; display: grid; width: min(100%, 420px); grid-template-columns: repeat(var(--heart-count), minmax(0, 1fr)); align-items: center; margin: 3px auto 0; }
-    .heart-progress::before { position: absolute; top: 50%; right: 12%; left: 12%; height: 2px; background: rgba(114,65,91,.2); content: ""; transform: translateY(-50%); }
-    .progress-heart { position: relative; z-index: 1; color: #bda8b2; font-size: 1.45rem; line-height: 1; text-align: center; }
-    .progress-heart.is-filled { color: #bd4d79; }
-    .progress-heart.is-current { animation: heart-beat .9s ease-in-out infinite alternate; }
-
-    .step-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 17px;
+    .progress-kind {
+      position: absolute;
+      left: 0;
       color: var(--gold);
-      font: 600 .74rem Arial, sans-serif;
-      letter-spacing: .15em;
-      text-transform: uppercase;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
-    .step-label::before { width: 23px; height: 1px; background: var(--gold); content: ""; }
+    .heart-progress { position: relative; display: grid; width: min(72%, 420px); grid-template-columns: repeat(var(--heart-count), minmax(0, 1fr)); align-items: center; margin: 0 auto; }
+    .heart-progress::before { position: absolute; top: 50%; right: 12%; left: 12%; height: 2px; background: rgba(114,65,91,.2); content: ""; transform: translateY(-50%); }
+    .heart-progress::after { position: absolute; top: 50%; left: 12%; width: var(--progress-width, 0); height: 2px; background: linear-gradient(90deg, #bd4d79, #c97696); content: ""; transform: translateY(-50%); animation: fill-progress .65s cubic-bezier(.2,.8,.2,1) both; }
+    .progress-heart { position: relative; z-index: 1; color: #bda8b2; font-size: 1.45rem; line-height: 1; text-align: center; transition: color .35s ease, transform .35s ease; }
+    .progress-heart.is-filled { color: #bd4d79; transform: scale(1.08); }
+    .progress-heart.is-current { animation: heart-beat .9s ease-in-out infinite alternate; }
+
     .question { margin: 0 0 23px; color: #755c70; }
 
     .memory-layout {
@@ -274,16 +276,16 @@
       text-transform: uppercase;
     }
 
-    .quiz-title { margin: 0 0 22px; color: var(--ink); font-size: clamp(1.75rem, 5vw, 2.7rem); text-align: center; }
+    .quiz-title { margin: 0 0 22px; color: var(--ink); font-size: clamp(2.15rem, 5.5vw, 3.25rem); text-align: center; }
     .mini-game { text-align: center; }
-    .mini-game-copy { max-width: 650px; margin: 0 auto 15px; color: var(--muted); font: 1rem/1.6 Arial, sans-serif; }
+    .mini-game-copy { max-width: 650px; margin: 0 auto 15px; color: var(--muted); font: 1.16rem/1.6 Arial, sans-serif; }
     .game-feedback { position: absolute; z-index: 3; width: min(48%, 360px); margin: 0; padding: 10px 14px; border: 1px solid rgba(157,86,120,.32); border-radius: 14px; color: var(--gold); background: rgba(248,232,240,.97); box-shadow: 0 8px 22px rgba(69,35,57,.16); font: 600 .95rem/1.5 Arial, sans-serif; text-align: center; pointer-events: none; }
     .dodge-arena { position: relative; min-height: 330px; overflow: hidden; margin: 18px 0 12px; border: 1px dashed rgba(157,86,120,.48); border-radius: 20px; background: radial-gradient(ellipse at center, rgba(247,223,234,.9), rgba(232,207,220,.36)); }
     .dodge-button { position: absolute; top: 50%; left: 50%; min-width: 180px; transform: translate(-50%, -50%); white-space: nowrap; transition: left .22s ease, top .22s ease; }
     .dodge-button:hover { transform: translate(-50%, -50%); }
     .dodge-button.is-ready { border-color: rgba(157,86,120,.55); background: linear-gradient(110deg, #e6a8b7, #f1c6d2); }
     .answer-form { display: grid; gap: 13px; }
-    .choice-instruction { margin: 0; color: var(--muted); font: .9rem/1.5 Arial, sans-serif; }
+    .choice-instruction { margin: 0; color: var(--muted); font: 1.08rem/1.5 Arial, sans-serif; }
     .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .choice-slot { min-width: 0; min-height: 52px; }
     .choice-button {
@@ -297,9 +299,9 @@
       border: 1px solid rgba(157,86,120,.4);
       border-radius: 13px;
       color: #5f3b53;
-      background: rgba(232,207,220,.72);
+      background: #fff9fc;
       cursor: pointer;
-      font: 600 .92rem/1.35 Arial, sans-serif;
+      font: 600 1.08rem/1.35 Arial, sans-serif;
       text-align: left;
       transition: transform .32s cubic-bezier(.2,.8,.2,1), border-color .18s ease, background .18s ease;
     }
@@ -329,7 +331,7 @@
       border-radius: 13px;
       outline: none;
       color: var(--ink);
-      background: rgba(250,240,245,.86);
+      background: #fffafd;
       font: 1rem Arial, sans-serif;
       transition: border-color .2s, box-shadow .2s;
     }
@@ -350,7 +352,7 @@
       background: linear-gradient(110deg, #d58ba7, #e6a8b7);
       box-shadow: 0 8px 26px rgba(140, 62, 97, .24);
       cursor: pointer;
-      font: 700 .88rem Arial, sans-serif;
+      font: 700 1.02rem Arial, sans-serif;
       transition: transform .2s, filter .2s, opacity .2s;
     }
 
@@ -361,7 +363,7 @@
     .button-row { display: flex; justify-content: center; gap: 11px; margin-top: 23px; }
     .answer-form .button { width: 100%; }
 
-    .hint, .feedback, .success-message { min-height: 24px; margin: 0; font: .88rem/1.55 Arial, sans-serif; }
+    .hint, .feedback, .success-message { min-height: 24px; margin: 0; font: 1.02rem/1.55 Arial, sans-serif; }
     .hint { margin-top: 13px; color: var(--gold); }
     .hint-button { width: 100%; min-height: 44px; margin-top: 3px; }
     .hint[hidden], .feedback[hidden], .success-message[hidden] { display: none; }
@@ -446,7 +448,7 @@
     .gallery-button { margin: 2px auto 0; animation: arrive .45s ease both; }
     .photo-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 25px; text-align: left; }
     .photo-gallery[hidden] { display: none; }
-    .gallery-photo { min-width: 0; margin: 0; overflow: hidden; border: 1px solid rgba(157,86,120,.35); border-radius: 15px; background: rgba(232,207,220,.62); box-shadow: 0 8px 22px rgba(69,35,57,.12); }
+    .gallery-photo { min-width: 0; margin: 0; overflow: hidden; border: 1px solid rgba(157,86,120,.35); border-radius: 15px; background: #fffafd; box-shadow: 0 8px 22px rgba(69,35,57,.12); }
     .gallery-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
     .gallery-photo figcaption { padding: 10px 12px 12px; color: #69445b; font: .78rem/1.4 Arial, sans-serif; text-align: center; }
     .memory-photo img,
@@ -560,6 +562,11 @@
       to { transform: scale(1.2); }
     }
 
+    @keyframes fill-progress {
+      from { width: 0; }
+      to { width: var(--progress-width, 0); }
+    }
+
     @media (max-width: 1000px) {
       .floating-photos { display: none; }
       .shell { width: min(100%, 760px); }
@@ -574,15 +581,15 @@
       }
       .shell { width: 100%; }
       .music-toggle { right: 10px; bottom: 10px; min-height: 42px; padding: 9px 12px; font-size: .76rem; }
-      .eyebrow { margin-bottom: 12px; padding: 0 8px; font-size: .64rem; line-height: 1.5; }
+      .eyebrow { margin-bottom: 12px; padding: 0 8px; font-size: .72rem; line-height: 1.5; }
       .card { padding: 24px 16px; border-radius: 20px; }
-      h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
-      h2 { font-size: clamp(1.75rem, 8vw, 2.35rem); }
-      .intro-copy, .question, .final-copy { font-size: .95rem; line-height: 1.65; }
+      h1 { font-size: clamp(2.7rem, 13vw, 3.8rem); }
+      h2 { font-size: clamp(2.15rem, 9vw, 2.75rem); }
+      .intro-copy, .question, .final-copy { font-size: 1.08rem; line-height: 1.65; }
       .gift-scene { height: 500px; }
       .gift-note { bottom: 128px; width: 100%; padding: 18px 14px; }
-      .gift-note h2 { font-size: 1.75rem; }
-      .gift-note .final-copy { font-size: .82rem; line-height: 1.48; }
+      .gift-note h2 { font-size: 2rem; }
+      .gift-note .final-copy { font-size: .98rem; line-height: 1.48; }
       .gift-box { transform: translateX(-50%) scale(.86); transform-origin: bottom center; }
       .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .memory-layout { grid-template-columns: 1fr; }
@@ -594,7 +601,14 @@
       .wifi-item { padding: 13px; }
       .button-row { flex-direction: column; }
       .button-row .button { width: 100%; }
-      .choice-button { font-size: .86rem; }
+      .choice-button { font-size: 1rem; }
+      .choice-instruction { font-size: 1rem; }
+      .mini-game-copy { font-size: 1.08rem; }
+      .button { font-size: .98rem; }
+      .hint, .feedback, .success-message { font-size: .98rem; }
+      .progress-heading { min-height: 52px; flex-direction: column; gap: 5px; }
+      .progress-kind { position: static; width: 100%; text-align: center; }
+      .heart-progress { width: min(92%, 420px); }
     }
 
     @media (max-width: 520px) {
@@ -608,8 +622,8 @@
       .memory-photo { min-height: 220px; height: 280px; }
       .gift-scene { height: 530px; }
       .gift-note { bottom: 122px; padding: 16px 12px; }
-      .gift-note h2 { font-size: 1.55rem; }
-      .gift-note .final-copy { font-size: .78rem; }
+      .gift-note h2 { font-size: 1.8rem; }
+      .gift-note .final-copy { font-size: .92rem; }
     }
 
     @media (min-width: 1366px) and (max-width: 1919px) {
@@ -636,7 +650,7 @@
       .card { padding: 70px 82px; }
       .floating-photo { width: 240px; }
       .memory-photo { min-height: 500px; }
-      .intro-copy, .question, .final-copy { max-width: 900px; font-size: 1.18rem; }
+      .intro-copy, .question, .final-copy { max-width: 900px; font-size: 1.42rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -647,7 +661,7 @@
 <body translate="no" class="notranslate">
   <main class="page">
     <div class="shell">
-      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐 <br>🖼️ Суреттерді үлкейтіп көру үшін суреттің үстінен басыңыз!😊</b></p>
+      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐 <br> Суреттерді үлкейтіп көру үшін суреттің үстінен басыңыз!😊</b></p>
       <section id="app" class="card" aria-live="polite"></section>
     </div>
   </main>
@@ -991,11 +1005,16 @@
       lockedChoiceIndex = null;
       otherChoiceAttempts = 0;
       const isMemory = !isQuiz && Boolean(step.image);
+      const progressWidth = stepList.length <= 1
+        ? "76%"
+        : `${(index / (stepList.length - 1)) * 76}%`;
       const content = `
         ${isQuiz ? '<h1 class="quiz-title">Жеңгеге арналған викторина</h1>' : ""}
         <div class="progress-wrap" aria-label="${isQuiz ? "Викторина барысы" : "Квест барысы ✨"}">
-          <div class="progress-heading"><span>${isQuiz ? `Сұрақ ${index + 1}` : `${index + 1}-ші блок`}</span><span>${index + 1} / ${stepList.length}</span></div>
-          <div class="heart-progress" style="--heart-count:${stepList.length}" role="img" aria-label="${index + 1} / ${stepList.length} ${isQuiz ? "сұрақ" : "блок"} орындалды">${stepList.map((_, heartIndex) => `<span class="progress-heart${heartIndex <= index ? " is-filled" : ""}${heartIndex === index ? " is-current" : ""}" aria-hidden="true">${heartIndex <= index ? "♥" : "♡"}</span>`).join("")}</div>
+          <div class="progress-heading">
+            <span class="progress-kind">${isQuiz ? "Викторина" : `${index + 1}-ші блок`}</span>
+            <div class="heart-progress" style="--heart-count:${stepList.length}; --progress-width:${progressWidth}" role="img" aria-label="${index + 1} / ${stepList.length} ${isQuiz ? "сұрақ" : "блок"} орындалды">${stepList.map((_, heartIndex) => `<span class="progress-heart${heartIndex <= index ? " is-filled" : ""}${heartIndex === index ? " is-current" : ""}" aria-hidden="true">${heartIndex <= index ? "♥" : "♡"}</span>`).join("")}</div>
+          </div>
         </div>
         ${isMemory ? `
           <div class="memory-layout">
@@ -1029,7 +1048,6 @@
         ? `<button class="button secondary hint-button" id="hintButton" type="button">Подсказка алу 💡</button>`
         : "";
       return `
-        <div class="step-label">${isQuiz ? `Сұрақ ${index + 1}` : `${index + 1}-ші блок`}</div>
         <h2>${step.title}</h2>
         ${step.question ? `<p class="question">${step.question}</p>` : ""}
         <form class="answer-form" id="answerForm">
@@ -1132,6 +1150,7 @@
 
     function acceptAnswer(step, selectedButton) {
       clearTimers();
+      celebrateCorrectAnswer(selectedButton);
       const answerForm = document.querySelector("#answerForm");
       const correctAnswerSlot = document.querySelector("#correctAnswerSlot");
       if (selectedButton) {
@@ -1491,8 +1510,7 @@
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
 
-    function burst(x, y) {
-      const count = 68;
+    function burst(x, y, count = 68) {
       for (let i = 0; i < count; i += 1) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 1 + Math.random() * 3.8;
@@ -1597,6 +1615,29 @@
       launchRocket();
       launchRocket();
       animateFireworks();
+    }
+
+    function celebrateCorrectAnswer(selectedButton) {
+      resizeCanvas();
+
+      const rect = selectedButton
+        ? selectedButton.getBoundingClientRect()
+        : null;
+      const x = rect
+        ? rect.left + rect.width / 2
+        : window.innerWidth / 2;
+      const y = rect
+        ? rect.top + rect.height / 2
+        : window.innerHeight / 2;
+
+      burst(x, y, window.innerWidth < 650 ? 18 : 26);
+
+      if (fireworksFrame === null) {
+        fireworksEndTime = performance.now() + 1800;
+        animateFireworks();
+      } else {
+        fireworksEndTime = Math.max(fireworksEndTime, performance.now() + 1800);
+      }
     }
 
     function stopFireworks() {
