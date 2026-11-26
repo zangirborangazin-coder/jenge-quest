@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="kk">
+<html lang="kk-KZ" translate="no" class="notranslate">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Language" content="kk-KZ">
+  <meta name="google" content="notranslate">
   <meta name="theme-color" content="#d7b0c1">
   <title>Туған күнге арналған квест</title>
   <style>
@@ -62,14 +64,21 @@
 
     .floating-photo {
       position: absolute;
-      width: clamp(112px, 12vw, 180px);
+      width: clamp(112px, 8vw, 240px);
       aspect-ratio: 4 / 5;
       object-fit: cover;
       border: 4px solid rgba(255, 246, 250, .88);
       border-radius: 18px;
       box-shadow: 0 12px 30px rgba(69, 35, 57, .24);
       opacity: .88;
+      cursor: zoom-in;
+      pointer-events: auto;
       will-change: transform;
+    }
+
+    .floating-photo:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 4px;
     }
 
     .floating-photo:nth-child(odd) { animation: float-photo-left 6.2s ease-in-out infinite; }
@@ -440,6 +449,56 @@
     .gallery-photo { min-width: 0; margin: 0; overflow: hidden; border: 1px solid rgba(157,86,120,.35); border-radius: 15px; background: rgba(232,207,220,.62); box-shadow: 0 8px 22px rgba(69,35,57,.12); }
     .gallery-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
     .gallery-photo figcaption { padding: 10px 12px 12px; color: #69445b; font: .78rem/1.4 Arial, sans-serif; text-align: center; }
+    .memory-photo img,
+    .gallery-photo img { cursor: zoom-in; }
+
+    .image-viewer {
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      max-height: none;
+      margin: 0;
+      padding: 28px;
+      border: 0;
+      background: rgba(20, 12, 18, .92);
+      overflow: hidden;
+    }
+
+    .image-viewer[open] {
+      display: grid;
+      place-items: center;
+    }
+
+    .image-viewer::backdrop { background: rgba(20, 12, 18, .92); }
+
+    .image-viewer img {
+      width: auto;
+      height: auto;
+      max-width: calc(100vw - 56px);
+      max-height: calc(100vh - 56px);
+      border: 5px solid rgba(255, 246, 250, .94);
+      border-radius: 16px;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, .45);
+      object-fit: contain;
+    }
+
+    .image-viewer-close {
+      position: fixed;
+      z-index: 2;
+      top: 16px;
+      right: 16px;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255, 255, 255, .65);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(40, 24, 35, .82);
+      cursor: pointer;
+      font: 700 1.35rem Arial, sans-serif;
+    }
+
+    .image-viewer-close:hover { background: #7d3d60; }
+    .image-viewer-close:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
     @keyframes float-photo-left {
       0%, 100% { transform: translateY(0) rotate(-5deg); }
@@ -501,31 +560,83 @@
       to { transform: scale(1.2); }
     }
 
+    @media (max-width: 1000px) {
+      .floating-photos { display: none; }
+      .shell { width: min(100%, 760px); }
+      .memory-layout { grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); }
+    }
+
     @media (max-width: 650px) {
-      .page { padding: 24px 14px; }
+      .page {
+        min-height: 100svh;
+        align-items: start;
+        padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+      }
+      .shell { width: 100%; }
       .music-toggle { right: 10px; bottom: 10px; min-height: 42px; padding: 9px 12px; font-size: .76rem; }
-      .card { border-radius: 22px; }
-      .gift-scene { height: 345px; }
-      .gift-note { bottom: 79px; width: 96%; padding: 18px 16px; }
-      .gift-box { transform: translateX(-50%) scale(.9); transform-origin: bottom center; }
-      .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .eyebrow { margin-bottom: 12px; padding: 0 8px; font-size: .64rem; line-height: 1.5; }
+      .card { padding: 24px 16px; border-radius: 20px; }
+      h1 { font-size: clamp(2.1rem, 11vw, 3.2rem); }
+      h2 { font-size: clamp(1.75rem, 8vw, 2.35rem); }
+      .intro-copy, .question, .final-copy { font-size: .95rem; line-height: 1.65; }
+      .gift-scene { height: 500px; }
+      .gift-note { bottom: 128px; width: 100%; padding: 18px 14px; }
+      .gift-note h2 { font-size: 1.75rem; }
+      .gift-note .final-copy { font-size: .82rem; line-height: 1.48; }
+      .gift-box { transform: translateX(-50%) scale(.86); transform-origin: bottom center; }
+      .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .memory-layout { grid-template-columns: 1fr; }
-      .memory-photo { min-height: 280px; max-height: 380px; }
+      .memory-photo { min-height: 280px; height: min(64vh, 380px); }
       .choice-grid { grid-template-columns: 1fr; }
       .game-feedback { width: calc(100% - 24px); }
       .dodge-arena { min-height: 350px; }
+      .dodge-button { min-width: 150px; max-width: calc(100% - 24px); white-space: normal; }
       .wifi-item { padding: 13px; }
       .button-row { flex-direction: column; }
       .button-row .button { width: 100%; }
+      .choice-button { font-size: .86rem; }
     }
 
-    @media (max-width: 1000px) {
-      .floating-photos { display: none; }
+    @media (max-width: 520px) {
+      .photo-gallery { grid-template-columns: 1fr; }
+      .memory-photo { min-height: 235px; height: min(58vh, 330px); }
     }
 
     @media (max-width: 390px) {
-      .memory-photo { min-height: 245px; }
-      .photo-gallery { grid-template-columns: 1fr; }
+      .page { padding-right: 7px; padding-left: 7px; }
+      .card { padding: 21px 12px; }
+      .memory-photo { min-height: 220px; height: 280px; }
+      .gift-scene { height: 530px; }
+      .gift-note { bottom: 122px; padding: 16px 12px; }
+      .gift-note h2 { font-size: 1.55rem; }
+      .gift-note .final-copy { font-size: .78rem; }
+    }
+
+    @media (min-width: 1366px) and (max-width: 1919px) {
+      .shell { width: min(70vw, 950px); }
+      .floating-photo { width: clamp(145px, 9vw, 180px); }
+    }
+
+    @media (min-width: 1920px) and (max-width: 2559px) {
+      .shell { width: min(58vw, 1100px); }
+      .card { padding: clamp(46px, 3vw, 64px); }
+      .floating-photo { width: clamp(180px, 8vw, 210px); }
+      .memory-photo { min-height: 400px; }
+    }
+
+    @media (min-width: 2560px) and (max-width: 3839px) {
+      .shell { width: min(48vw, 1200px); }
+      .card { padding: 58px 70px; }
+      .floating-photo { width: clamp(210px, 7vw, 220px); }
+      .memory-photo { min-height: 430px; }
+    }
+
+    @media (min-width: 3840px) {
+      .shell { width: min(36vw, 1400px); }
+      .card { padding: 70px 82px; }
+      .floating-photo { width: 240px; }
+      .memory-photo { min-height: 500px; }
+      .intro-copy, .question, .final-copy { max-width: 900px; font-size: 1.18rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -533,25 +644,29 @@
     }
   </style>
 </head>
-<body>
+<body translate="no" class="notranslate">
   <main class="page">
     <div class="shell">
-      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐</p>
+      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐 <br>🖼️ Суреттерді үлкейтіп көру үшін суреттің үстінен басыңыз!😊</b></p>
       <section id="app" class="card" aria-live="polite"></section>
     </div>
   </main>
   <audio id="backgroundMusic" src="happy%20birthday.mp3" autoplay loop preload="auto"></audio>
   <button class="music-toggle" id="musicToggle" type="button" aria-label="Фондық музыканы қосу" aria-pressed="false">Музыканы қосу 🎵</button>
   <span class="sr-only" id="musicStatus" aria-live="polite"></span>
-  <aside class="floating-photos" aria-hidden="true">
-    <img class="floating-photo" src="1.jpg" data-tone="monochrome" alt="" decoding="async">
-    <img class="floating-photo" src="2.jpg" data-tone="monochrome" alt="" decoding="async">
-    <img class="floating-photo" src="3.jpg" data-tone="color" alt="" decoding="async">
-    <img class="floating-photo" src="4.jpg" data-tone="monochrome" alt="" decoding="async">
-    <img class="floating-photo" src="5.jpg" data-tone="color" alt="" decoding="async">
-    <img class="floating-photo" src="6.jpg" data-tone="color" alt="" decoding="async">
+  <aside class="floating-photos" aria-label="Қалқыма суреттер">
+    <img class="floating-photo" src="1.jpg" data-tone="monochrome" alt="Қалқыма сурет 1" role="button" tabindex="0" decoding="async">
+    <img class="floating-photo" src="2.jpg" data-tone="monochrome" alt="Қалқыма сурет 2" role="button" tabindex="0" decoding="async">
+    <img class="floating-photo" src="3.jpg" data-tone="color" alt="Қалқыма сурет 3" role="button" tabindex="0" decoding="async">
+    <img class="floating-photo" src="4.jpg" data-tone="monochrome" alt="Қалқыма сурет 4" role="button" tabindex="0" decoding="async">
+    <img class="floating-photo" src="5.jpg" data-tone="color" alt="Қалқыма сурет 5" role="button" tabindex="0" decoding="async">
+    <img class="floating-photo" src="6.jpg" data-tone="color" alt="Қалқыма сурет 6" role="button" tabindex="0" decoding="async">
   </aside>
   <canvas id="fireworks" class="fireworks" aria-hidden="true"></canvas>
+  <dialog class="image-viewer" id="imageViewer" aria-label="Суретті толық экранда көру">
+    <button class="image-viewer-close" id="imageViewerClose" type="button" aria-label="Суретті жабу">×</button>
+    <img id="imageViewerImage" src="" alt="">
+  </dialog>
 
   <script>
     const steps = [
@@ -681,6 +796,9 @@
     const musicStatus = document.querySelector("#musicStatus");
     const canvas = document.querySelector("#fireworks");
     const floatingPhotos = Array.from(document.querySelectorAll(".floating-photo"));
+    const imageViewer = document.querySelector("#imageViewer");
+    const imageViewerImage = document.querySelector("#imageViewerImage");
+    const imageViewerClose = document.querySelector("#imageViewerClose");
     const ctx = canvas.getContext("2d");
     const wifiPassword = "2711";
     const fireworkColors = ["#bd2f68", "#78449f", "#a86618", "#28788a", "#c63d66", "#603b91"];
@@ -720,7 +838,15 @@
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const shellWidth = document.querySelector(".shell").getBoundingClientRect().width;
-      const photoWidth = Math.min(180, Math.max(112, viewportWidth * .12));
+      const photoWidth = viewportWidth >= 3840
+        ? 240
+        : viewportWidth >= 2560
+          ? Math.min(220, Math.max(210, viewportWidth * .07))
+          : viewportWidth >= 1920
+            ? Math.min(210, Math.max(180, viewportWidth * .08))
+            : viewportWidth >= 1366
+              ? Math.min(180, Math.max(145, viewportWidth * .09))
+              : Math.min(180, Math.max(112, viewportWidth * .12));
       const photoHeight = photoWidth * 1.25;
       const shellLeft = (viewportWidth - shellWidth) / 2;
       const shellRight = shellLeft + shellWidth;
@@ -750,6 +876,36 @@
         rightPhoto.style.top = `${top}px`;
       }
     }
+
+    function openImageViewer(image) {
+      imageViewerImage.src = image.currentSrc || image.src;
+      imageViewerImage.alt = image.alt || "Толық экрандағы сурет";
+      if (typeof imageViewer.showModal === "function") imageViewer.showModal();
+      else imageViewer.setAttribute("open", "");
+    }
+
+    function closeImageViewer() {
+      if (typeof imageViewer.close === "function") imageViewer.close();
+      else imageViewer.removeAttribute("open");
+    }
+
+    document.addEventListener("click", (event) => {
+      const image = event.target.closest("img");
+      if (!image || image === imageViewerImage) return;
+      openImageViewer(image);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if ((event.key === "Enter" || event.key === " ") && event.target.matches(".floating-photo")) {
+        event.preventDefault();
+        openImageViewer(event.target);
+      }
+    });
+
+    imageViewerClose.addEventListener("click", closeImageViewer);
+    imageViewer.addEventListener("click", (event) => {
+      if (event.target === imageViewer) closeImageViewer();
+    });
 
     function updateMusicToggle() {
       const isPlaying = !backgroundMusic.paused && !backgroundMusic.ended;
