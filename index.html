@@ -10,12 +10,12 @@
   <style>
     :root {
       color-scheme: light;
-      --ink: #4e3447;
-      --muted: #715c70;
-      --gold: #a75578;
-      --rose: #c97696;
-      --panel: rgba(255, 251, 253, .97);
-      --line: rgba(114, 65, 91, .22);
+      --ink: #46343f;
+      --muted: #74616d;
+      --gold: #9a657b;
+      --rose: #b77f96;
+      --panel: rgba(255, 252, 249, .97);
+      --line: rgba(106, 78, 94, .20);
     }
 
     * { box-sizing: border-box; }
@@ -28,8 +28,8 @@
       color: var(--ink);
       font-family: Georgia, "Times New Roman", serif;
       background:
-        radial-gradient(circle at 50% 50%, rgba(255, 248, 251, .18), transparent 32%),
-        linear-gradient(135deg, #d9b1c1 0%, #cdaabd 52%, #ddbcca 100%);
+        radial-gradient(circle at 50% 44%, rgba(255, 252, 248, .30), transparent 34%),
+        linear-gradient(135deg, #d8c1c8 0%, #cbb1bd 52%, #d6c2c7 100%);
       background-size: 100% 100%, 220% 220%;
       overflow-x: hidden;
       animation: background-flow 8s ease-in-out infinite alternate;
@@ -58,6 +58,26 @@
       100% { transform: translate3d(8%, 5%, 0) scale(1.12) rotate(3deg); }
     }
 
+    .heart-decorations {
+      position: fixed;
+      z-index: 2;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .heart-decoration {
+      position: absolute;
+      color: rgba(255, 255, 255, .24);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1;
+      text-align: center;
+      text-shadow: 0 1px 5px rgba(255, 255, 255, .12);
+      transform: rotate(var(--heart-rotation, 0deg));
+      transition: left 1.2s ease-in-out, top 1.2s ease-in-out, opacity .45s ease;
+      animation: heart-pulse var(--pulse-speed, 2.4s) ease-in-out var(--pulse-delay, 0s) infinite;
+    }
+
     .floating-photos {
       position: fixed;
       z-index: 4;
@@ -78,6 +98,7 @@
       cursor: zoom-in;
       pointer-events: auto;
       will-change: transform;
+      transition: left 1.35s ease-in-out, top 1.35s ease-in-out;
     }
 
     .floating-photo:focus-visible {
@@ -562,6 +583,11 @@
       to { transform: scale(1.2); }
     }
 
+    @keyframes heart-pulse {
+      0%, 100% { transform: rotate(var(--heart-rotation, 0deg)) scale(.92); opacity: .72; }
+      50% { transform: rotate(var(--heart-rotation, 0deg)) scale(1.16); opacity: 1; }
+    }
+
     @keyframes fill-progress {
       from { width: 0; }
       to { width: var(--progress-width, 0); }
@@ -661,13 +687,14 @@
 <body translate="no" class="notranslate">
   <main class="page">
     <div class="shell">
-      <p class="eyebrow">Естеліктерге толы шағын саяхат 💐 <br> Суреттерді үлкейтіп көру үшін суреттің үстінен басыңыз!😊</b></p>
+      <p class="eyebrow">Суреттерді үлкейтіп көру үшін суреттің үстінен басыңыз! 😊</p>
       <section id="app" class="card" aria-live="polite"></section>
     </div>
   </main>
   <audio id="backgroundMusic" src="happy%20birthday.mp3" autoplay loop preload="auto"></audio>
   <button class="music-toggle" id="musicToggle" type="button" aria-label="Фондық музыканы қосу" aria-pressed="false">Музыканы қосу 🎵</button>
   <span class="sr-only" id="musicStatus" aria-live="polite"></span>
+  <div class="heart-decorations" id="heartDecorations" aria-hidden="true"></div>
   <aside class="floating-photos" aria-label="Қалқыма суреттер">
     <img class="floating-photo" src="1.jpg" data-tone="monochrome" alt="Қалқыма сурет 1" role="button" tabindex="0" decoding="async">
     <img class="floating-photo" src="2.jpg" data-tone="monochrome" alt="Қалқыма сурет 2" role="button" tabindex="0" decoding="async">
@@ -810,6 +837,7 @@
     const musicStatus = document.querySelector("#musicStatus");
     const canvas = document.querySelector("#fireworks");
     const floatingPhotos = Array.from(document.querySelectorAll(".floating-photo"));
+    const heartDecorations = document.querySelector("#heartDecorations");
     const imageViewer = document.querySelector("#imageViewer");
     const imageViewerImage = document.querySelector("#imageViewerImage");
     const imageViewerClose = document.querySelector("#imageViewerClose");
@@ -837,6 +865,8 @@
     let particles = [];
     let rockets = [];
     let floatingPhotoResizeTimer = null;
+    let heartDecorationTimer = null;
+    let floatingPhotoTimer = null;
 
     function shuffle(items) {
       for (let i = items.length - 1; i > 0; i--) {
@@ -888,6 +918,89 @@
         leftPhoto.style.top = `${top}px`;
         rightPhoto.style.left = `${right}px`;
         rightPhoto.style.top = `${top}px`;
+      }
+    }
+
+    function positionHeartDecorations() {
+      if (!heartDecorations) return;
+
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const shellRect = document.querySelector(".shell").getBoundingClientRect();
+      const blockedRects = floatingPhotos
+        .filter(photo => getComputedStyle(photo).display !== "none")
+        .map(photo => photo.getBoundingClientRect());
+      const heartCount =
+        viewportWidth < 650 ? 10 :
+        viewportWidth < 1366 ? 24 :
+        38;
+      const hearts = [];
+
+      heartDecorations.replaceChildren();
+
+      for (let index = 0; index < heartCount; index += 1) {
+        const size = 28 + Math.floor(Math.random() * 20);
+        let left = 0;
+        let top = 0;
+
+        const candidates = [];
+        for (let y = 24; y <= viewportHeight - size - 24; y += 58) {
+          for (let x = 24; x <= viewportWidth - size - 24; x += 58) {
+            candidates.push({
+              left: x + Math.floor(Math.random() * 18 - 9),
+              top: y + Math.floor(Math.random() * 18 - 9)
+            });
+          }
+        }
+        shuffle(candidates);
+
+        for (const candidate of candidates) {
+          const candidateLeft = Math.max(18, Math.min(viewportWidth - size - 18, candidate.left));
+          const candidateTop = Math.max(18, Math.min(viewportHeight - size - 18, candidate.top));
+          const heartRect = {
+            left: candidateLeft - 16,
+            right: candidateLeft + size + 16,
+            top: candidateTop - 16,
+            bottom: candidateTop + size + 16
+          };
+          const overlapsShell =
+            heartRect.right > shellRect.left - 18 &&
+            heartRect.left < shellRect.right + 18 &&
+            heartRect.bottom > shellRect.top - 18 &&
+            heartRect.top < shellRect.bottom + 18;
+          const overlapsPhoto = blockedRects.some(rect =>
+            heartRect.right > rect.left - 20 &&
+            heartRect.left < rect.right + 20 &&
+            heartRect.bottom > rect.top - 20 &&
+            heartRect.top < rect.bottom + 20
+          );
+          const overlapsHeart = hearts.some(rect =>
+            heartRect.right > rect.left &&
+            heartRect.left < rect.right &&
+            heartRect.bottom > rect.top &&
+            heartRect.top < rect.bottom
+          );
+
+          if (!overlapsShell && !overlapsPhoto && !overlapsHeart) {
+            left = candidateLeft;
+            top = candidateTop;
+            break;
+          }
+        }
+
+        if (left === 0 && top === 0) continue;
+
+        const heart = document.createElement("span");
+        heart.className = "heart-decoration";
+        heart.textContent = "♡";
+        heart.style.left = `${left}px`;
+        heart.style.top = `${top}px`;
+        heart.style.fontSize = `${size}px`;
+        heart.style.setProperty("--heart-rotation", `${-18 + Math.random() * 36}deg`);
+        heart.style.setProperty("--pulse-speed", `${2.1 + Math.random() * 1.8}s`);
+        heart.style.setProperty("--pulse-delay", `${-Math.random() * 3}s`);
+        heartDecorations.appendChild(heart);
+        hearts.push({ left: left - 10, right: left + size + 10, top: top - 10, bottom: top + size + 10 });
       }
     }
 
@@ -956,12 +1069,12 @@
       currentStage = "quest";
       app.innerHTML = `
         <div class="intro">
-          <h1>Туған күн 🎂<br>квесті ✨</h1>
+          <h1>Естеліктерге толы ерекше күн</h1>
           <p class="intro-copy">Жылы естеліктерге бірге саяхат жасап, бүгінгі күннің қуанышын бөлісейік. 💖</p>
           <div class="wifi" aria-label="Үйдің Wi-Fi желісі">
-            <div class="wifi-item"><span class="wifi-label">Желі атауы</span><span class="wifi-value">Merekenin_Basty_Keiipkeri</span></div>
+            <div class="wifi-item"><span class="wifi-label">WI-FI атауы</span><span class="wifi-value">Merekenin_Basty_Keiipkeri</span></div>
           </div>
-          <p class="wifi-hint">Подсказка: Бүгінгі ерекше күн! ☀️</p>
+          <p class="wifi-hint">Бүгінгі күннің басты құпиясы қандай?</p>
           <form class="wifi-form" id="wifiForm">
             <label class="sr-only" for="wifiPassword">Wi-Fi құпиясөзі</label>
             <input class="answer-input" id="wifiPassword" name="wifiPassword" type="password" placeholder="Құпиясөзді енгізіңіз" autocomplete="off" required>
@@ -1650,11 +1763,22 @@
 
     window.addEventListener("resize", () => {
       window.clearTimeout(floatingPhotoResizeTimer);
-      floatingPhotoResizeTimer = window.setTimeout(positionFloatingPhotos, 120);
+      floatingPhotoResizeTimer = window.setTimeout(() => {
+        positionFloatingPhotos();
+        positionHeartDecorations();
+      }, 120);
       if (currentStep === steps.length) resizeCanvas();
     });
 
     positionFloatingPhotos();
+    positionHeartDecorations();
+    if (heartDecorationTimer !== null) window.clearInterval(heartDecorationTimer);
+    heartDecorationTimer = window.setInterval(positionHeartDecorations, 3000);
+    if (floatingPhotoTimer !== null) window.clearInterval(floatingPhotoTimer);
+    floatingPhotoTimer = window.setInterval(() => {
+      positionFloatingPhotos();
+      window.setTimeout(positionHeartDecorations, 1450);
+    }, 7500);
     backgroundMusic.volume = .35;
     backgroundMusic.addEventListener("play", updateMusicToggle);
     backgroundMusic.addEventListener("pause", updateMusicToggle);
