@@ -1154,7 +1154,7 @@
 
     function stepContent(step, index, isQuiz) {
       const answerControl = step.options
-        ? `<p class="choice-instruction">${isQuiz ? "Тест нұсқаларының бірін таңдаңыз:" : "Тест нұсқаларының бірін таңдаңыз — дұрыс жауап қашып кетуі мүмкін! 😄"}</p>
+        ? `<p class="choice-instruction">${isQuiz ? "Тест нұсқаларының бірін таңдаңыз:" : "Тест нұсқаларының бірін таңдаңыз:"}</p>
            <div class="choice-grid">${step.options.map((option, optionIndex) => `<div class="choice-slot"><button class="choice-button" type="button" data-choice="${optionIndex}"><span class="choice-marker" aria-hidden="true"></span><span class="choice-label">${option}</span></button></div>`).join("")}</div>`
         : "";
       const hintButton = step.hint && !isQuiz
