@@ -98,16 +98,13 @@
       cursor: zoom-in;
       pointer-events: auto;
       will-change: transform;
-      transition: left 1.35s ease-in-out, top 1.35s ease-in-out;
+      transition: none;
     }
 
     .floating-photo:focus-visible {
       outline: 3px solid #fff;
       outline-offset: 4px;
     }
-
-    .floating-photo:nth-child(odd) { animation: float-photo-left 6.2s ease-in-out infinite; }
-    .floating-photo:nth-child(even) { animation: float-photo-right 6.8s ease-in-out infinite; }
 
     .music-toggle {
       position: fixed;
@@ -759,7 +756,7 @@
         image: "01.08.2022.jpg",
         imageAlt: "Той күніндегі жас жұбайлар мен жақындары",
         caption: "Бақытқа толы той күні 🎉",
-        hint: "Күнтізбедегі сегізінші айдың алғашқы күні",
+        hint: "Жаздың ең алғашқы күні, 2022 жыл.",
         success: "Тамаша! Сол күнгі қуаныш пен жылулық бүгін де жалғасып келеді. 🎉💞"
       }
     ];
